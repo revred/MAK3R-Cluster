@@ -1,0 +1,68 @@
+/* Progressive List Styles */
+.progressive-list[b-ejosjehb3u] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--mak3r-spacing);
+}
+
+.progressive-list-item[b-ejosjehb3u] {
+    transition: all 0.3s var(--mak3r-transition);
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.progressive-list-item.loading[b-ejosjehb3u] {
+    opacity: 0.7;
+    transform: translateY(10px);
+}
+
+.progressive-list-item.loaded[b-ejosjehb3u] {
+    opacity: 1;
+    transform: translateY(0);
+    animation: slideInUp-b-ejosjehb3u 0.4s ease-out;
+}
+
+.load-more-trigger[b-ejosjehb3u] {
+    height: 1px;
+    width: 100%;
+    opacity: 0;
+}
+
+/* Animations */
+@keyframes slideInUp-b-ejosjehb3u {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Stagger animation for multiple items */
+.progressive-list-item:nth-child(1)[b-ejosjehb3u] { animation-delay: 0ms; }
+.progressive-list-item:nth-child(2)[b-ejosjehb3u] { animation-delay: 50ms; }
+.progressive-list-item:nth-child(3)[b-ejosjehb3u] { animation-delay: 100ms; }
+.progressive-list-item:nth-child(4)[b-ejosjehb3u] { animation-delay: 150ms; }
+.progressive-list-item:nth-child(5)[b-ejosjehb3u] { animation-delay: 200ms; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .progressive-list[b-ejosjehb3u] {
+        gap: var(--mak3r-spacing-sm);
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .progressive-list-item[b-ejosjehb3u] {
+        animation: none;
+        transition: none;
+    }
+    
+    .progressive-list-item.loading[b-ejosjehb3u] {
+        opacity: 0.8;
+        transform: none;
+    }
+}

@@ -1,0 +1,183 @@
+@using MAK3R.UI.Services
+@typeparam TItem
+@inject IProgressiveLoadingService ProgressiveLoading
+
+<div class="progressive-list">
+    @if (!Items.Any() && IsLoading)
+    {
+        @* Show skeleton cards while initial load *@
+        @for (int i = 0; i < SkeletonCount; i++)
+        {
+            <SkeletonCard ShowContent="@ShowSkeletonContent" ShowActions="@ShowSkeletonActions" />
+        }
+    }
+    else
+    {
+        @foreach (var item in Items)
+        {
+            <div class="progressive-list-item @(IsItemLoading(item) ? "loading" : "loaded")">
+                @if (IsItemLoading(item))
+                {
+                    <SkeletonCard ShowContent="@ShowSkeletonContent" ShowActions="@ShowSkeletonActions" />
+                }
+                else
+                {
+                    @ItemTemplate(item)
+                }
+            </div>
+        }
+        
+        @if (HasMore && !IsLoadingMore)
+        {
+            <div class="load-more-trigger" @ref="loadMoreTrigger"></div>
+        }
+        
+        @if (IsLoadingMore)
+        {
+            @for (int i = 0; i < PageSize / 4; i++)
+            {
+                <SkeletonCard ShowContent="@ShowSkeletonContent" ShowActions="@ShowSkeletonActions" />
+            }
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public RenderFragment<TItem> ItemTemplate { get; set; } = null!;
+    [Parameter] public Func<int, int, CancellationToken, ValueTask<IEnumerable<TItem>>> DataLoader { get; set; } = null!;
+    [Parameter] public int PageSize { get; set; } = 20;
+    [Parameter] public int SkeletonCount { get; set; } = 6;
+    [Parameter] public bool ShowSkeletonContent { get; set; } = true;
+    [Parameter] public bool ShowSkeletonActions { get; set; } = true;
+    [Parameter] public Func<TItem, bool>? IsItemLoadingFunc { get; set; }
+    [Parameter] public bool AutoLoadMore { get; set; } = true;
+
+    private List<TItem> Items = new();
+    private bool IsLoading = false;
+    private bool IsLoadingMore = false;
+    private bool HasMore = true;
+    private ElementReference loadMoreTrigger;
+    private IAsyncEnumerator<TItem>? dataStream;
+    private CancellationTokenSource? cancellationTokenSource;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await StartLoading();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && AutoLoadMore)
+        {
+            await SetupIntersectionObserver();
+        }
+    }
+
+    private bool IsItemLoading(TItem item)
+    {
+        return IsItemLoadingFunc?.Invoke(item) ?? false;
+    }
+
+    private async Task StartLoading()
+    {
+        if (IsLoading) return;
+        
+        IsLoading = true;
+        cancellationTokenSource?.Cancel();
+        cancellationTokenSource = new CancellationTokenSource();
+        
+        try
+        {
+            dataStream = ProgressiveLoading.LoadProgressivelyAsync(
+                DataLoader, PageSize, cancellationTokenSource.Token
+            ).GetAsyncEnumerator(cancellationTokenSource.Token);
+            
+            // Load first batch
+            await LoadNextBatch();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error starting progressive load: {ex.Message}");
+            HasMore = false;
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadNextBatch()
+    {
+        if (dataStream == null || !HasMore || IsLoadingMore) return;
+        
+        IsLoadingMore = true;
+        StateHasChanged();
+        
+        try
+        {
+            var batchCount = 0;
+            var maxBatchSize = PageSize / 2; // Load in smaller batches for better UX
+            
+            while (batchCount < maxBatchSize && await dataStream.MoveNextAsync())
+            {
+                Items.Add(dataStream.Current);
+                batchCount++;
+                
+                // Update UI every few items for progressive appearance
+                if (batchCount % 3 == 0)
+                {
+                    StateHasChanged();
+                    await Task.Delay(10); // Small delay for smooth animation
+                }
+            }
+            
+            // Check if we've reached the end
+            if (batchCount < maxBatchSize)
+            {
+                HasMore = false;
+                await dataStream.DisposeAsync();
+                dataStream = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading next batch: {ex.Message}");
+            HasMore = false;
+        }
+        finally
+        {
+            IsLoadingMore = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SetupIntersectionObserver()
+    {
+        // This would typically use JS interop for intersection observer
+        // For now, we'll simulate with a timer
+        _ = Task.Run(async () =>
+        {
+            while (HasMore && !cancellationTokenSource?.Token.IsCancellationRequested == true)
+            {
+                await Task.Delay(1000, cancellationTokenSource?.Token ?? CancellationToken.None);
+                
+                // Simulate checking if load-more trigger is visible
+                if (HasMore && !IsLoadingMore && Items.Count > 0)
+                {
+                    await InvokeAsync(LoadNextBatch);
+                }
+            }
+        });
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        cancellationTokenSource?.Cancel();
+        if (dataStream != null)
+        {
+            await dataStream.DisposeAsync();
+        }
+        cancellationTokenSource?.Dispose();
+    }
+}

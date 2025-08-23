@@ -1,0 +1,11 @@
+C:\code\MAK3R-Cluster\libs\MAK3R.Shared\bin\Debug\net8.0\MAK3R.Shared.deps.json
+C:\code\MAK3R-Cluster\libs\MAK3R.Shared\bin\Debug\net8.0\MAK3R.Shared.dll
+C:\code\MAK3R-Cluster\libs\MAK3R.Shared\bin\Debug\net8.0\MAK3R.Shared.pdb
+C:\code\MAK3R-Cluster\libs\MAK3R.Shared\obj\Debug\net8.0\MAK3R.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\code\MAK3R-Cluster\libs\MAK3R.Shared\obj\Debug\net8.0\MAK3R.Shared.AssemblyInfoInputs.cache
+C:\code\MAK3R-Cluster\libs\MAK3R.Shared\obj\Debug\net8.0\MAK3R.Shared.AssemblyInfo.cs
+C:\code\MAK3R-Cluster\libs\MAK3R.Shared\obj\Debug\net8.0\MAK3R.Shared.csproj.CoreCompileInputs.cache
+C:\code\MAK3R-Cluster\libs\MAK3R.Shared\obj\Debug\net8.0\MAK3R.Shared.dll
+C:\code\MAK3R-Cluster\libs\MAK3R.Shared\obj\Debug\net8.0\refint\MAK3R.Shared.dll
+C:\code\MAK3R-Cluster\libs\MAK3R.Shared\obj\Debug\net8.0\MAK3R.Shared.pdb
+C:\code\MAK3R-Cluster\libs\MAK3R.Shared\obj\Debug\net8.0\ref\MAK3R.Shared.dll

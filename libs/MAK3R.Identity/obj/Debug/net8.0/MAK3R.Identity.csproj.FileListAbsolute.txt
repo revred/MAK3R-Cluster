@@ -1,0 +1,11 @@
+C:\code\MAK3R-Cluster\libs\MAK3R.Identity\bin\Debug\net8.0\MAK3R.Identity.deps.json
+C:\code\MAK3R-Cluster\libs\MAK3R.Identity\bin\Debug\net8.0\MAK3R.Identity.dll
+C:\code\MAK3R-Cluster\libs\MAK3R.Identity\bin\Debug\net8.0\MAK3R.Identity.pdb
+C:\code\MAK3R-Cluster\libs\MAK3R.Identity\obj\Debug\net8.0\MAK3R.Identity.GeneratedMSBuildEditorConfig.editorconfig
+C:\code\MAK3R-Cluster\libs\MAK3R.Identity\obj\Debug\net8.0\MAK3R.Identity.AssemblyInfoInputs.cache
+C:\code\MAK3R-Cluster\libs\MAK3R.Identity\obj\Debug\net8.0\MAK3R.Identity.AssemblyInfo.cs
+C:\code\MAK3R-Cluster\libs\MAK3R.Identity\obj\Debug\net8.0\MAK3R.Identity.csproj.CoreCompileInputs.cache
+C:\code\MAK3R-Cluster\libs\MAK3R.Identity\obj\Debug\net8.0\MAK3R.Identity.dll
+C:\code\MAK3R-Cluster\libs\MAK3R.Identity\obj\Debug\net8.0\refint\MAK3R.Identity.dll
+C:\code\MAK3R-Cluster\libs\MAK3R.Identity\obj\Debug\net8.0\MAK3R.Identity.pdb
+C:\code\MAK3R-Cluster\libs\MAK3R.Identity\obj\Debug\net8.0\ref\MAK3R.Identity.dll

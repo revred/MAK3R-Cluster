@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\MAK3R.UI.props" />
+</Project>

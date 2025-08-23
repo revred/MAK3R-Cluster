@@ -1,0 +1,664 @@
+@page "/connectors"
+@using MAK3R.Connectors.Abstractions
+@using MAK3R.Shared.DTOs
+@using System.Text.Json
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<PageTitle>Connector Hub</PageTitle>
+
+<div class="page-header">
+    <h1>Connector Hub</h1>
+    <p>Manage and configure data connectors for your digital twin</p>
+</div>
+
+<div class="connector-dashboard">
+    <div class="connector-types">
+        <h2>Available Connector Types</h2>
+        
+        @if (availableTypes == null)
+        {
+            <div class="loading-placeholder">
+                <SkeletonCard />
+                <SkeletonCard />
+                <SkeletonCard />
+            </div>
+        }
+        else if (!availableTypes.Any())
+        {
+            <div class="empty-state">
+                <span class="empty-icon">🔌</span>
+                <h3>No Connector Types Available</h3>
+                <p>Install connector packages to get started.</p>
+            </div>
+        }
+        else
+        {
+            <div class="connector-type-grid">
+                @foreach (var type in availableTypes)
+                {
+                    <div class="connector-type-card @(type.IsAvailable ? "available" : "unavailable")">
+                        <div class="type-header">
+                            <span class="type-icon">@GetConnectorIcon(type.Category)</span>
+                            <div class="type-info">
+                                <h3>@type.DisplayName</h3>
+                                <span class="type-category">@type.Category</span>
+                            </div>
+                            <div class="type-status">
+                                @if (type.IsAvailable)
+                                {
+                                    <span class="status-badge available">Available</span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge unavailable">Unavailable</span>
+                                }
+                            </div>
+                        </div>
+                        <p class="type-description">@type.Description</p>
+                        <div class="type-meta">
+                            <span class="version">v@type.Version</span>
+                        </div>
+                        <div class="type-actions">
+                            @if (type.IsAvailable)
+                            {
+                                <button class="btn btn-primary" @onclick="() => ShowCreateConnector(type)">
+                                    Create Instance
+                                </button>
+                                <button class="btn btn-secondary" @onclick="() => ShowSchema(type.TypeId)">
+                                    View Schema
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="connector-instances">
+        <h2>Active Connector Instances</h2>
+        
+        @if (activeConnectors == null)
+        {
+            <div class="loading-placeholder">
+                <SkeletonCard />
+                <SkeletonCard />
+            </div>
+        }
+        else if (!activeConnectors.Any())
+        {
+            <div class="empty-state">
+                <span class="empty-icon">⚡</span>
+                <h3>No Active Connectors</h3>
+                <p>Create connector instances to start syncing data.</p>
+            </div>
+        }
+        else
+        {
+            <div class="connector-instance-grid">
+                @foreach (var connector in activeConnectors)
+                {
+                    <div class="connector-instance-card">
+                        <div class="instance-header">
+                            <span class="instance-icon">@GetConnectorIcon(connector.Type)</span>
+                            <div class="instance-info">
+                                <h3>@connector.Name</h3>
+                                <span class="instance-id">@connector.Id</span>
+                            </div>
+                            <div class="instance-actions">
+                                <button class="btn btn-sm btn-secondary" @onclick="() => CheckHealth(connector.Id)">
+                                    Health Check
+                                </button>
+                                <button class="btn btn-sm btn-primary" @onclick="() => TriggerSync(connector.Id)">
+                                    Sync Now
+                                </button>
+                            </div>
+                        </div>
+                        <div class="instance-metadata">
+                            @if (connector.Metadata != null)
+                            {
+                                @foreach (var meta in connector.Metadata.Take(3))
+                                {
+                                    <div class="metadata-item">
+                                        <span class="meta-key">@meta.Key:</span>
+                                        <span class="meta-value">@meta.Value</span>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@if (showCreateModal)
+{
+    <div class="modal-overlay" @onclick="CloseCreateModal">
+        <div class="modal-content" @onclick:stopPropagation="true">
+            <div class="modal-header">
+                <h3>Create @selectedType?.DisplayName Connector</h3>
+                <button class="modal-close" @onclick="CloseCreateModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                @if (configSchema != null)
+                {
+                    <form @onsubmit="CreateConnector" @onsubmit:preventDefault="true">
+                        <div class="form-group">
+                            <label for="connectorId">Connector ID</label>
+                            <input type="text" id="connectorId" @bind="newConnectorId" placeholder="my-connector-instance" required />
+                        </div>
+                        
+                        @foreach (var field in configSchema.Fields.Values)
+                        {
+                            <div class="form-group">
+                                <label for="@field.Name">
+                                    @field.DisplayName
+                                    @if (field.IsRequired)
+                                    {
+                                        <span class="required">*</span>
+                                    }
+                                </label>
+                                
+                                @if (field.Type == "string")
+                                {
+                                    @if (field.IsSecret)
+                                    {
+                                        <input type="password" id="@field.Name" 
+                                               @onchange="@(e => UpdateConfigValue(field.Name, e.Value?.ToString()))"
+                                               placeholder="@field.Description" 
+                                               required="@field.IsRequired" />
+                                    }
+                                    else if (field.EnumValues?.Any() == true)
+                                    {
+                                        <select id="@field.Name" 
+                                                @onchange="@(e => UpdateConfigValue(field.Name, e.Value?.ToString()))"
+                                                required="@field.IsRequired">
+                                            <option value="">Select...</option>
+                                            @foreach (var option in field.EnumValues)
+                                            {
+                                                <option value="@option">@option</option>
+                                            }
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        <input type="text" id="@field.Name" 
+                                               @onchange="@(e => UpdateConfigValue(field.Name, e.Value?.ToString()))"
+                                               placeholder="@field.Description" 
+                                               required="@field.IsRequired" />
+                                    }
+                                }
+                                else if (field.Type == "number")
+                                {
+                                    <input type="number" id="@field.Name" 
+                                           @onchange="@(e => UpdateConfigValue(field.Name, e.Value?.ToString()))"
+                                           placeholder="@field.Description" 
+                                           required="@field.IsRequired" />
+                                }
+                                else if (field.Type == "boolean")
+                                {
+                                    <input type="checkbox" id="@field.Name" 
+                                           @onchange="@(e => UpdateConfigValue(field.Name, e.Value))"
+                                           required="@field.IsRequired" />
+                                }
+                                
+                                @if (!string.IsNullOrEmpty(field.Description))
+                                {
+                                    <small class="field-description">@field.Description</small>
+                                }
+                            </div>
+                        }
+                        
+                        <div class="modal-actions">
+                            <button type="button" class="btn btn-secondary" @onclick="CloseCreateModal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary" disabled="@isCreatingConnector">
+                                @if (isCreatingConnector)
+                                {
+                                    <span>Creating...</span>
+                                }
+                                else
+                                {
+                                    <span>Create Connector</span>
+                                }
+                            </button>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <div class="loading-placeholder">
+                        <SkeletonCard />
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+.connector-dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.connector-type-grid, .connector-instance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.connector-type-card, .connector-instance-card {
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: border-color 0.2s;
+}
+
+.connector-type-card:hover, .connector-instance-card:hover {
+    border-color: var(--primary-color);
+}
+
+.connector-type-card.unavailable {
+    opacity: 0.6;
+}
+
+.type-header, .instance-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.type-icon, .instance-icon {
+    font-size: 2rem;
+}
+
+.type-info, .instance-info {
+    flex: 1;
+}
+
+.type-info h3, .instance-info h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.type-category {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.instance-id {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-family: 'Courier New', monospace;
+}
+
+.status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.status-badge.available {
+    background: var(--success-color-light);
+    color: var(--success-color);
+}
+
+.status-badge.unavailable {
+    background: var(--warning-color-light);
+    color: var(--warning-color);
+}
+
+.type-description {
+    color: var(--text-muted);
+    margin: 1rem 0;
+    line-height: 1.4;
+}
+
+.type-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.type-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.instance-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.instance-metadata {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.metadata-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.meta-key {
+    color: var(--text-muted);
+}
+
+.meta-value {
+    font-family: 'Courier New', monospace;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--surface-color);
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.required {
+    color: var(--danger-color);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--background-color);
+    color: var(--text-color);
+}
+
+.field-description {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+@@media (max-width: 768px) {
+    .connector-dashboard {
+        grid-template-columns: 1fr;
+    }
+    
+    .connector-type-grid, .connector-instance-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+@code {
+    private IEnumerable<ConnectorTypeInfo>? availableTypes;
+    private IEnumerable<dynamic>? activeConnectors;
+    private bool showCreateModal = false;
+    private ConnectorTypeInfo? selectedType;
+    private ConnectorConfigurationSchema? configSchema;
+    private string newConnectorId = "";
+    private Dictionary<string, object> configValues = new();
+    private bool isCreatingConnector = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            // Load available connector types
+            var typesResponse = await Http.GetAsync("/api/connectors/types");
+            if (typesResponse.IsSuccessStatusCode)
+            {
+                var json = await typesResponse.Content.ReadAsStringAsync();
+                availableTypes = JsonSerializer.Deserialize<ConnectorTypeInfo[]>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+            }
+
+            // Load active connector instances
+            var instancesResponse = await Http.GetAsync("/api/connectors/instances");
+            if (instancesResponse.IsSuccessStatusCode)
+            {
+                var json = await instancesResponse.Content.ReadAsStringAsync();
+                activeConnectors = JsonSerializer.Deserialize<dynamic[]>(json);
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("console.error", "Failed to load connector data", ex.Message);
+        }
+    }
+
+    private async Task ShowCreateConnector(ConnectorTypeInfo type)
+    {
+        selectedType = type;
+        showCreateModal = true;
+        configValues.Clear();
+        newConnectorId = $"{type.TypeId}-{DateTime.Now:yyyyMMddHHmm}";
+
+        // Load configuration schema
+        try
+        {
+            var response = await Http.GetAsync($"/api/connectors/types/{type.TypeId}/schema");
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                configSchema = JsonSerializer.Deserialize<ConnectorConfigurationSchema>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("console.error", "Failed to load schema", ex.Message);
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task ShowSchema(string typeId)
+    {
+        // Open schema in a new tab or modal
+        await JS.InvokeVoidAsync("console.log", $"Show schema for {typeId}");
+    }
+
+    private void CloseCreateModal()
+    {
+        showCreateModal = false;
+        selectedType = null;
+        configSchema = null;
+        configValues.Clear();
+    }
+
+    private void UpdateConfigValue(string key, object? value)
+    {
+        if (value != null)
+        {
+            configValues[key] = value;
+        }
+        else
+        {
+            configValues.Remove(key);
+        }
+    }
+
+    private async Task CreateConnector()
+    {
+        if (selectedType == null || configSchema == null)
+            return;
+
+        isCreatingConnector = true;
+        
+        try
+        {
+            var request = new
+            {
+                ConnectorId = newConnectorId,
+                TypeId = selectedType.TypeId,
+                Type = selectedType.Category,
+                Settings = configValues,
+                IsEnabled = true
+            };
+
+            var response = await Http.PostAsJsonAsync("/api/connectors", request);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("alert", "Connector created successfully!");
+                CloseCreateModal();
+                await LoadData(); // Refresh the data
+            }
+            else
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                await JS.InvokeVoidAsync("alert", $"Failed to create connector: {error}");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Error creating connector: {ex.Message}");
+        }
+        finally
+        {
+            isCreatingConnector = false;
+        }
+    }
+
+    private async Task CheckHealth(string connectorId)
+    {
+        try
+        {
+            var response = await Http.GetAsync($"/api/connectors/instances/{connectorId}/health");
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                await JS.InvokeVoidAsync("alert", $"Health check result: {json}");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("alert", "Health check failed");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Health check error: {ex.Message}");
+        }
+    }
+
+    private async Task TriggerSync(string connectorId)
+    {
+        try
+        {
+            var response = await Http.PostAsync($"/api/connectors/instances/{connectorId}/sync", null);
+            if (response.IsSuccessStatusCode)
+            {
+                await JS.InvokeVoidAsync("alert", "Sync triggered successfully");
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("alert", "Sync failed");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Sync error: {ex.Message}");
+        }
+    }
+
+    private string GetConnectorIcon(string type)
+    {
+        return type switch
+        {
+            "shopify" => "🛒",
+            "netsuite" => "💼",
+            "opcua" => "🏭",
+            "rest-api" => "🌐",
+            "database" => "🗄️",
+            "file" => "📁",
+            _ => "🔌"
+        };
+    }
+}

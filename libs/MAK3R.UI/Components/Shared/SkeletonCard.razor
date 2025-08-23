@@ -1,0 +1,33 @@
+@* Skeleton loading placeholder for cards *@
+
+<div class="skeleton-card">
+    <div class="skeleton-header">
+        <div class="skeleton-avatar"></div>
+        <div class="skeleton-text-group">
+            <div class="skeleton-text skeleton-text-title"></div>
+            <div class="skeleton-text skeleton-text-subtitle"></div>
+        </div>
+    </div>
+    
+    @if (ShowContent)
+    {
+        <div class="skeleton-content">
+            <div class="skeleton-text skeleton-text-line"></div>
+            <div class="skeleton-text skeleton-text-line skeleton-text-short"></div>
+            <div class="skeleton-text skeleton-text-line"></div>
+        </div>
+    }
+    
+    @if (ShowActions)
+    {
+        <div class="skeleton-actions">
+            <div class="skeleton-button"></div>
+            <div class="skeleton-button skeleton-button-small"></div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public bool ShowContent { get; set; } = true;
+    [Parameter] public bool ShowActions { get; set; } = true;
+}

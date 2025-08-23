@@ -1,0 +1,192 @@
+.review-step {
+    height: 100%;
+    overflow-y: auto;
+}
+
+.review-sections {
+    margin-bottom: var(--mak3r-spacing-xl);
+}
+
+.review-section {
+    background-color: var(--mak3r-surface);
+    border: 1px solid var(--mak3r-border);
+    border-radius: var(--mak3r-radius);
+    margin-bottom: var(--mak3r-spacing-lg);
+    overflow: hidden;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--mak3r-spacing);
+    padding: var(--mak3r-spacing-lg);
+    background-color: var(--mak3r-panel);
+    border-bottom: 1px solid var(--mak3r-border);
+}
+
+.section-header .material-symbols-outlined {
+    font-size: 24px;
+    color: var(--mak3r-accent);
+}
+
+.section-header h3 {
+    margin: 0;
+    color: var(--mak3r-text);
+    font-size: var(--mak3r-font-size-lg);
+    font-weight: var(--mak3r-font-weight-semibold);
+}
+
+.section-content {
+    padding: var(--mak3r-spacing-lg);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--mak3r-spacing);
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--mak3r-spacing-sm) 0;
+    border-bottom: 1px solid var(--mak3r-grid);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-item .label {
+    font-weight: var(--mak3r-font-weight-medium);
+    color: var(--mak3r-text-muted);
+    font-size: var(--mak3r-font-size-sm);
+}
+
+.info-item .value {
+    color: var(--mak3r-text);
+    font-size: var(--mak3r-font-size-sm);
+    text-align: right;
+}
+
+.items-list {
+    display: grid;
+    gap: var(--mak3r-spacing);
+}
+
+.item-card {
+    background-color: var(--mak3r-bg);
+    border: 1px solid var(--mak3r-grid);
+    border-radius: var(--mak3r-radius-sm);
+    padding: var(--mak3r-spacing);
+}
+
+.item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--mak3r-spacing-sm);
+}
+
+.item-header h4 {
+    margin: 0;
+    color: var(--mak3r-text);
+    font-size: var(--mak3r-font-size-base);
+    font-weight: var(--mak3r-font-weight-medium);
+}
+
+.badge {
+    background-color: var(--mak3r-accent-dim);
+    color: var(--mak3r-accent);
+    padding: 4px var(--mak3r-spacing-sm);
+    border-radius: var(--mak3r-radius-sm);
+    font-size: var(--mak3r-font-size-xs);
+    font-weight: var(--mak3r-font-weight-medium);
+}
+
+.badge.price {
+    background-color: var(--mak3r-success-dim);
+    color: var(--mak3r-success);
+}
+
+.item-detail {
+    display: flex;
+    align-items: center;
+    gap: var(--mak3r-spacing-sm);
+    color: var(--mak3r-text-muted);
+    font-size: var(--mak3r-font-size-sm);
+}
+
+.item-detail .material-symbols-outlined {
+    font-size: 16px;
+    color: var(--mak3r-text-dim);
+}
+
+.create-section {
+    background-color: var(--mak3r-surface);
+    border: 1px solid var(--mak3r-border);
+    border-radius: var(--mak3r-radius);
+    padding: var(--mak3r-spacing-xl);
+    text-align: center;
+    margin-top: var(--mak3r-spacing-xl);
+}
+
+.create-info {
+    margin-bottom: var(--mak3r-spacing-xl);
+}
+
+.create-info h3 {
+    margin: 0 0 var(--mak3r-spacing-sm) 0;
+    color: var(--mak3r-text);
+    font-size: var(--mak3r-font-size-xl);
+}
+
+.create-actions button.large {
+    padding: var(--mak3r-spacing-lg) var(--mak3r-spacing-xl);
+    font-size: var(--mak3r-font-size-lg);
+    min-width: 200px;
+    gap: var(--mak3r-spacing);
+}
+
+.loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .item-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--mak3r-spacing-sm);
+    }
+    
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .info-item .value {
+        text-align: left;
+    }
+    
+    .create-actions button.large {
+        width: 100%;
+        min-width: auto;
+    }
+}

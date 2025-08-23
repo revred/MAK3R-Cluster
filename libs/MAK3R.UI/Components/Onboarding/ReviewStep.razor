@@ -1,0 +1,187 @@
+@using MAK3R.Shared.DTOs
+
+<div class="step-content review-step">
+    <div class="step-header">
+        <h2>Review & Create</h2>
+        <p class="text-muted">Review your digital twin configuration before creating</p>
+    </div>
+
+    <div class="review-sections">
+        <!-- Company Section -->
+        <div class="review-section">
+            <div class="section-header">
+                <span class="material-symbols-outlined">business</span>
+                <h3>Company Information</h3>
+            </div>
+            <div class="section-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">Name:</span>
+                        <span class="value">@WizardData.Company.Name</span>
+                    </div>
+                    @if (!string.IsNullOrEmpty(WizardData.Company.Industry))
+                    {
+                        <div class="info-item">
+                            <span class="label">Industry:</span>
+                            <span class="value">@WizardData.Company.Industry</span>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(WizardData.Company.RegistrationId))
+                    {
+                        <div class="info-item">
+                            <span class="label">Registration ID:</span>
+                            <span class="value">@WizardData.Company.RegistrationId</span>
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(WizardData.Company.Website))
+                    {
+                        <div class="info-item">
+                            <span class="label">Website:</span>
+                            <span class="value">@WizardData.Company.Website</span>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Sites Section -->
+        <div class="review-section">
+            <div class="section-header">
+                <span class="material-symbols-outlined">location_on</span>
+                <h3>Sites (@WizardData.Sites.Count)</h3>
+            </div>
+            <div class="section-content">
+                @if (WizardData.Sites.Any())
+                {
+                    <div class="items-list">
+                        @foreach (var site in WizardData.Sites)
+                        {
+                            <div class="item-card">
+                                <div class="item-header">
+                                    <h4>@site.Name</h4>
+                                </div>
+                                @if (!string.IsNullOrEmpty(site.City) || !string.IsNullOrEmpty(site.Country))
+                                {
+                                    <div class="item-detail">
+                                        <span class="material-symbols-outlined">place</span>
+                                        <span>@($"{site.City}{(!string.IsNullOrEmpty(site.City) && !string.IsNullOrEmpty(site.Country) ? ", " : "")}{site.Country}")</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">No sites configured</p>
+                }
+            </div>
+        </div>
+
+        <!-- Machines Section -->
+        <div class="review-section">
+            <div class="section-header">
+                <span class="material-symbols-outlined">precision_manufacturing</span>
+                <h3>Machines (@WizardData.Machines.Count)</h3>
+            </div>
+            <div class="section-content">
+                @if (WizardData.Machines.Any())
+                {
+                    <div class="items-list">
+                        @foreach (var machine in WizardData.Machines)
+                        {
+                            <div class="item-card">
+                                <div class="item-header">
+                                    <h4>@machine.Name</h4>
+                                    <span class="badge">@machine.SiteName</span>
+                                </div>
+                                @if (!string.IsNullOrEmpty(machine.Make) || !string.IsNullOrEmpty(machine.Model))
+                                {
+                                    <div class="item-detail">
+                                        <span class="material-symbols-outlined">info</span>
+                                        <span>@($"{machine.Make}{(!string.IsNullOrEmpty(machine.Make) && !string.IsNullOrEmpty(machine.Model) ? " " : "")}{machine.Model}")</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">No machines configured</p>
+                }
+            </div>
+        </div>
+
+        <!-- Products Section -->
+        <div class="review-section">
+            <div class="section-header">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <h3>Products (@WizardData.Products.Count)</h3>
+            </div>
+            <div class="section-content">
+                @if (WizardData.Products.Any())
+                {
+                    <div class="items-list">
+                        @foreach (var product in WizardData.Products)
+                        {
+                            <div class="item-card">
+                                <div class="item-header">
+                                    <h4>@product.Name</h4>
+                                    @if (product.Price.HasValue && !string.IsNullOrEmpty(product.Currency))
+                                    {
+                                        <span class="badge price">@product.Currency @product.Price.Value.ToString("N2")</span>
+                                    }
+                                </div>
+                                @if (!string.IsNullOrEmpty(product.Category))
+                                {
+                                    <div class="item-detail">
+                                        <span class="material-symbols-outlined">category</span>
+                                        <span>@product.Category</span>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted">No products configured</p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="create-section">
+        <div class="create-info">
+            <h3>Ready to Create Your Digital Twin?</h3>
+            <p class="text-muted">This will create your digital twin with all the information above. You can always modify it later.</p>
+        </div>
+        
+        <div class="create-actions">
+            <button class="primary large" @onclick="HandleCreate" disabled="@IsSubmitting">
+                @if (IsSubmitting)
+                {
+                    <span class="loading-spinner"></span>
+                    <span>Creating Digital Twin...</span>
+                }
+                else
+                {
+                    <span class="material-symbols-outlined">auto_awesome</span>
+                    <span>Create Digital Twin</span>
+                }
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public OnboardingWizardDto WizardData { get; set; } = null!;
+    [Parameter] public EventCallback OnSubmit { get; set; }
+    [Parameter] public bool IsSubmitting { get; set; }
+
+    private async Task HandleCreate()
+    {
+        await OnSubmit.InvokeAsync();
+    }
+}

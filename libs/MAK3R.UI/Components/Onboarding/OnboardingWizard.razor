@@ -1,0 +1,164 @@
+@using MAK3R.Shared.DTOs
+@using System.ComponentModel.DataAnnotations
+
+<div class="onboarding-wizard">
+    <div class="wizard-header">
+        <h1>Welcome to MAK3R</h1>
+        <p class="text-muted">Let's set up your digital twin in a few simple steps</p>
+    </div>
+
+    <div class="wizard-progress">
+        <div class="progress-steps">
+            @for (int i = 1; i <= 5; i++)
+            {
+                <div class="step @(i <= CurrentStep ? "active" : "") @(i < CurrentStep ? "completed" : "")">
+                    <div class="step-number">@i</div>
+                    <div class="step-label">@GetStepLabel(i)</div>
+                </div>
+            }
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" style="width: @(CurrentStep * 20)%"></div>
+        </div>
+    </div>
+
+    <div class="wizard-content">
+        @switch (CurrentStep)
+        {
+            case 1:
+                <CompanyStep @bind-Company="WizardData.Company" 
+                           IsValid="@IsStepValid(1)" 
+                           ValidationErrors="@ValidationErrors" />
+                break;
+            case 2:
+                <SitesStep @bind-Sites="WizardData.Sites" 
+                          IsValid="@IsStepValid(2)" 
+                          ValidationErrors="@ValidationErrors" />
+                break;
+            case 3:
+                <MachinesStep @bind-Machines="WizardData.Machines" 
+                             Sites="@WizardData.Sites"
+                             IsValid="@IsStepValid(3)" 
+                             ValidationErrors="@ValidationErrors" />
+                break;
+            case 4:
+                <ProductsStep @bind-Products="WizardData.Products" 
+                             IsValid="@IsStepValid(4)" 
+                             ValidationErrors="@ValidationErrors" />
+                break;
+            case 5:
+                <ReviewStep WizardData="@WizardData" 
+                           OnSubmit="@HandleSubmit" 
+                           IsSubmitting="@IsSubmitting" />
+                break;
+        }
+    </div>
+
+    <div class="wizard-navigation">
+        <button class="secondary" 
+                @onclick="PreviousStep" 
+                disabled="@(CurrentStep == 1)">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Previous
+        </button>
+        
+        @if (CurrentStep < 5)
+        {
+            <button @onclick="NextStep" 
+                    disabled="@(!IsStepValid(CurrentStep))">
+                Next
+                <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback<OnboardingResult> OnComplete { get; set; }
+    
+    private int CurrentStep = 1;
+    private bool IsSubmitting = false;
+    private List<string> ValidationErrors = new();
+    
+    private OnboardingWizardDto WizardData = new();
+
+    private string GetStepLabel(int step) => step switch
+    {
+        1 => "Company",
+        2 => "Sites", 
+        3 => "Machines",
+        4 => "Products",
+        5 => "Review",
+        _ => ""
+    };
+
+    private bool IsStepValid(int step) => step switch
+    {
+        1 => !string.IsNullOrWhiteSpace(WizardData.Company.Name),
+        2 => WizardData.Sites.Any() && WizardData.Sites.All(s => !string.IsNullOrWhiteSpace(s.Name)),
+        3 => true, // Machines are optional
+        4 => true, // Products are optional
+        5 => true,
+        _ => false
+    };
+
+    private void NextStep()
+    {
+        if (IsStepValid(CurrentStep) && CurrentStep < 5)
+        {
+            CurrentStep++;
+            StateHasChanged();
+        }
+    }
+
+    private void PreviousStep()
+    {
+        if (CurrentStep > 1)
+        {
+            CurrentStep--;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        IsSubmitting = true;
+        ValidationErrors.Clear();
+        
+        try
+        {
+            // Validate final data
+            if (string.IsNullOrWhiteSpace(WizardData.Company.Name))
+            {
+                ValidationErrors.Add("Company name is required");
+                return;
+            }
+            
+            if (!WizardData.Sites.Any())
+            {
+                ValidationErrors.Add("At least one site is required");
+                return;
+            }
+
+            // Submit to API would go here
+            var result = new OnboardingResult(
+                Guid.NewGuid(),
+                WizardData.Sites.ToDictionary(s => s.Name, _ => Guid.NewGuid()),
+                WizardData.Machines.ToDictionary(m => m.Name, _ => Guid.NewGuid()),
+                WizardData.Products.ToDictionary(p => p.Name, _ => Guid.NewGuid()),
+                new List<string>(),
+                new List<string>()
+            );
+
+            await OnComplete.InvokeAsync(result);
+        }
+        catch (Exception ex)
+        {
+            ValidationErrors.Add($"Error creating digital twin: {ex.Message}");
+        }
+        finally
+        {
+            IsSubmitting = false;
+        }
+    }
+}

@@ -1,0 +1,16 @@
+﻿<Project>
+  <ItemGroup>
+    <StaticWebAssetEndpoint Include="_content/MAK3R.UI/MAK3R.UI.bundle.scp.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\MAK3R.UI.q4j7cmup5y.bundle.scp.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-miAo5RHMZ4NnKZGocm3XdHsjcRsuVkEH\u002BSIiTpRmtUE="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"21196"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022miAo5RHMZ4NnKZGocm3XdHsjcRsuVkEH\u002BSIiTpRmtUE=\u0022"},{"Name":"Last-Modified","Value":"Sat, 23 Aug 2025 14:42:06 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/MAK3R.UI/MAK3R.UI.q4j7cmup5y.bundle.scp.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\MAK3R.UI.q4j7cmup5y.bundle.scp.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"q4j7cmup5y"},{"Name":"integrity","Value":"sha256-miAo5RHMZ4NnKZGocm3XdHsjcRsuVkEH\u002BSIiTpRmtUE="},{"Name":"label","Value":"_content/MAK3R.UI/MAK3R.UI.bundle.scp.css"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"21196"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022miAo5RHMZ4NnKZGocm3XdHsjcRsuVkEH\u002BSIiTpRmtUE=\u0022"},{"Name":"Last-Modified","Value":"Sat, 23 Aug 2025 14:42:06 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+  </ItemGroup>
+</Project>

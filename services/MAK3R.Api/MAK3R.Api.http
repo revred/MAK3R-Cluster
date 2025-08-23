@@ -1,0 +1,6 @@
+@MAK3R.Api_HostAddress = http://localhost:5137
+
+GET {{MAK3R.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

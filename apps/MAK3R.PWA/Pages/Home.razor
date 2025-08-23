@@ -1,0 +1,160 @@
+﻿@page "/"
+@using MAK3R.Shared.DTOs
+@inject HttpClient Http
+
+<PageTitle>MAK3R Dashboard</PageTitle>
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Digital Twin Dashboard</h1>
+        <p class="text-muted">Welcome to your unified manufacturing data platform</p>
+    </div>
+
+    @if (demoData != null)
+    {
+        <div class="dashboard-grid">
+            <!-- Company Overview -->
+            <div class="dashboard-card company-card">
+                <h2>@demoData.Company.Name</h2>
+                <div class="company-details">
+                    <div class="detail-item">
+                        <span class="label">Industry:</span>
+                        <span class="value">@demoData.Company.Industry</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">GST:</span>
+                        <span class="value">@demoData.Company.TaxId</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Website:</span>
+                        <a href="@demoData.Company.Website" class="value link">@demoData.Company.Website</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sites Overview -->
+            <div class="dashboard-card sites-card">
+                <h3>Production Sites</h3>
+                <div class="stats-grid">
+                    @foreach (var site in demoData.Sites)
+                    {
+                        <div class="site-item">
+                            <h4>@site.Name</h4>
+                            <p class="site-location">@site.City, @site.Country</p>
+                            <p class="site-description">@site.Description</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Machines Overview -->
+            <div class="dashboard-card machines-card">
+                <h3>Machine Status</h3>
+                <div class="machine-grid">
+                    @foreach (var machine in demoData.Machines)
+                    {
+                        <div class="machine-item">
+                            <div class="machine-header">
+                                <h4>@machine.Name</h4>
+                                <span class="machine-status running">●</span>
+                            </div>
+                            <p class="machine-details">@machine.Make @machine.Model</p>
+                            <p class="machine-location text-muted">@machine.SiteName</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Products Overview -->
+            <div class="dashboard-card products-card">
+                <h3>Product Catalog</h3>
+                <div class="product-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">@demoData.Products.Count</span>
+                        <span class="stat-label">Total Products</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">@demoData.Products.Count(p => p.Price.HasValue)</span>
+                        <span class="stat-label">Priced Items</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">@demoData.Products.Select(p => p.Category).Distinct().Count()</span>
+                        <span class="stat-label">Categories</span>
+                    </div>
+                </div>
+                <div class="product-categories">
+                    @foreach (var category in demoData.Products.GroupBy(p => p.Category))
+                    {
+                        <div class="category-item">
+                            <span class="category-name">@category.Key</span>
+                            <span class="category-count">@category.Count() items</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="dashboard-card actions-card">
+                <h3>Quick Actions</h3>
+                <div class="action-buttons">
+                    <button class="action-btn primary">
+                        <span class="material-symbols-outlined">settings_input_composite</span>
+                        New Onboarding
+                    </button>
+                    <button class="action-btn secondary">
+                        <span class="material-symbols-outlined">hub</span>
+                        Add Connector
+                    </button>
+                    <button class="action-btn secondary">
+                        <span class="material-symbols-outlined">precision_manufacturing</span>
+                        Monitor Machines
+                    </button>
+                    <button class="action-btn secondary">
+                        <span class="material-symbols-outlined">storefront</span>
+                        Build Shopfront
+                    </button>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="dashboard-grid">
+            <!-- Progressive loading with skeleton cards -->
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard ShowContent="false" />
+        </div>
+    }
+</div>
+
+@code {
+    private OnboardingWizardDto? demoData;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load data progressively without blocking UI
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                // Small delay to show skeleton briefly
+                await Task.Delay(500);
+                
+                var data = await Http.GetFromJsonAsync<OnboardingWizardDto>("api/demo/contoso-gears");
+                await InvokeAsync(() =>
+                {
+                    demoData = data;
+                    StateHasChanged();
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to load demo data: {ex.Message}");
+                // Keep showing skeleton on error - user can retry
+            }
+        });
+    }
+}

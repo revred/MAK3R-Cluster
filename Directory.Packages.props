@@ -1,0 +1,78 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Core .NET packages -->
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11" />
+    
+    <!-- Blazor UI packages -->
+    <PackageVersion Include="Blazored.LocalStorage" Version="4.5.0" />
+    <PackageVersion Include="Toolbelt.Blazor.HttpClientInterceptor" Version="10.2.0" />
+    
+    <!-- API documentation -->
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="8.0.11" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.8.1" />
+    
+    <!-- Validation -->
+    <PackageVersion Include="FluentValidation" Version="11.10.0" />
+    <PackageVersion Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    
+    <!-- Rules Engine -->
+    <PackageVersion Include="NRules" Version="0.9.5" />
+    
+    <!-- OPC UA -->
+    <PackageVersion Include="OPCFoundation.NetStandard.Opc.Ua" Version="1.5.374.54" />
+    
+    <!-- HTTP clients -->
+    <PackageVersion Include="RestSharp" Version="112.1.0" />
+    <PackageVersion Include="AngleSharp" Version="1.1.2" />
+    
+    <!-- File processing -->
+    <PackageVersion Include="CsvHelper" Version="33.0.1" />
+    <PackageVersion Include="ExcelDataReader" Version="3.7.0" />
+    <PackageVersion Include="ExcelDataReader.DataSet" Version="3.7.0" />
+    
+    <!-- UI Components -->
+    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="8.0.11" />
+    
+    <!-- Development -->
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
+    
+    <!-- Testing -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageVersion Include="xunit" Version="2.9.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageVersion Include="MSTest.TestFramework" Version="3.6.3" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="3.6.3" />
+    <PackageVersion Include="MSTest" Version="3.6.3" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.2" />
+    <PackageVersion Include="Verify.Xunit" Version="28.3.2" />
+    <PackageVersion Include="WireMock.Net" Version="1.6.5" />
+    <PackageVersion Include="Microsoft.Playwright" Version="1.49.0" />
+    
+    <!-- Logging -->
+    <PackageVersion Include="Serilog" Version="4.1.0" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="8.0.3" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="6.0.0" />
+  </ItemGroup>
+</Project>

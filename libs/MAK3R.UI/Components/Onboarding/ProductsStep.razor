@@ -1,0 +1,216 @@
+@using MAK3R.Shared.DTOs
+
+<div class="step-content">
+    <div class="step-header">
+        <h2>Product Catalog</h2>
+        <p class="text-muted">Add your products or services (optional)</p>
+    </div>
+
+    @if (!Products.Any())
+    {
+        <div class="empty-state">
+            <span class="material-symbols-outlined">inventory_2</span>
+            <h3>No products added yet</h3>
+            <p>You can skip this step or add products now</p>
+            <button @onclick="AddProduct" class="primary">
+                <span class="material-symbols-outlined">add</span>
+                Add First Product
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="products-list">
+            @foreach (var (product, index) in Products.Select((p, i) => (p, i)))
+            {
+                <div class="product-card @(EditingIndex == index ? "editing" : "")">
+                    @if (EditingIndex == index)
+                    {
+                        <div class="product-form">
+                            <div class="form-header">
+                                <h4>@(index == Products.Count - 1 && string.IsNullOrEmpty(product.Name) ? "New Product" : "Edit Product")</h4>
+                                <div class="form-actions">
+                                    <button class="icon-button success" @onclick="() => SaveProduct(index)">
+                                        <span class="material-symbols-outlined">check</span>
+                                    </button>
+                                    <button class="icon-button danger" @onclick="() => CancelEdit(index)">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Product Name <span class="required">*</span></label>
+                                    <input type="text" @bind="EditingProduct.Name" @bind:event="oninput" 
+                                           placeholder="e.g., Precision Spur Gear 20T" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>SKU</label>
+                                    <input type="text" @bind="EditingProduct.Sku" 
+                                           placeholder="e.g., PSG-20T-M2" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Category</label>
+                                    <input type="text" @bind="EditingProduct.Category" 
+                                           placeholder="e.g., Spur Gears" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Price</label>
+                                    <input type="number" step="0.01" @bind="EditingProduct.Price" 
+                                           placeholder="0.00" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Currency</label>
+                                    <select @bind="EditingProduct.Currency">
+                                        <option value="">Select currency</option>
+                                        <option value="USD">USD</option>
+                                        <option value="EUR">EUR</option>
+                                        <option value="GBP">GBP</option>
+                                        <option value="INR">INR</option>
+                                        <option value="CNY">CNY</option>
+                                        <option value="JPY">JPY</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group full-width">
+                                    <label>Description</label>
+                                    <textarea @bind="EditingProduct.Description" rows="3" 
+                                             placeholder="Brief description of this product"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="product-display">
+                            <div class="product-info">
+                                <div class="product-header">
+                                    <h4>@product.Name</h4>
+                                    <div class="product-actions">
+                                        <button class="icon-button secondary" @onclick="() => EditProduct(index)">
+                                            <span class="material-symbols-outlined">edit</span>
+                                        </button>
+                                        <button class="icon-button danger" @onclick="() => RemoveProduct(index)">
+                                            <span class="material-symbols-outlined">delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="product-details">
+                                    @if (!string.IsNullOrEmpty(product.Sku))
+                                    {
+                                        <div class="detail-item">
+                                            <span class="material-symbols-outlined">tag</span>
+                                            <span>SKU: @product.Sku</span>
+                                        </div>
+                                    }
+                                    
+                                    @if (!string.IsNullOrEmpty(product.Category))
+                                    {
+                                        <div class="detail-item">
+                                            <span class="material-symbols-outlined">category</span>
+                                            <span>@product.Category</span>
+                                        </div>
+                                    }
+                                    
+                                    @if (product.Price.HasValue && !string.IsNullOrEmpty(product.Currency))
+                                    {
+                                        <div class="detail-item">
+                                            <span class="material-symbols-outlined">payments</span>
+                                            <span>@product.Currency @product.Price.Value.ToString("N2")</span>
+                                        </div>
+                                    }
+                                    
+                                    @if (!string.IsNullOrEmpty(product.Description))
+                                    {
+                                        <div class="detail-item">
+                                            <span class="material-symbols-outlined">description</span>
+                                            <span>@product.Description</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="add-product-section">
+            <button @onclick="AddProduct" class="secondary">
+                <span class="material-symbols-outlined">add</span>
+                Add Another Product
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public List<ProductInfo> Products { get; set; } = new();
+    [Parameter] public EventCallback<List<ProductInfo>> ProductsChanged { get; set; }
+    [Parameter] public bool IsValid { get; set; }
+    [Parameter] public List<string> ValidationErrors { get; set; } = new();
+
+    private int EditingIndex = -1;
+    private ProductInfo EditingProduct = new();
+
+    private void AddProduct()
+    {
+        var newProduct = new ProductInfo();
+        Products.Add(newProduct);
+        EditingIndex = Products.Count - 1;
+        EditingProduct = newProduct;
+        ProductsChanged.InvokeAsync(Products);
+    }
+
+    private void EditProduct(int index)
+    {
+        EditingIndex = index;
+        EditingProduct = Products[index];
+    }
+
+    private void SaveProduct(int index)
+    {
+        if (string.IsNullOrWhiteSpace(EditingProduct.Name))
+        {
+            return;
+        }
+
+        Products[index] = EditingProduct;
+        EditingIndex = -1;
+        EditingProduct = new();
+        ProductsChanged.InvokeAsync(Products);
+    }
+
+    private void CancelEdit(int index)
+    {
+        if (index == Products.Count - 1 && string.IsNullOrEmpty(Products[index].Name))
+        {
+            Products.RemoveAt(index);
+        }
+        
+        EditingIndex = -1;
+        EditingProduct = new();
+        ProductsChanged.InvokeAsync(Products);
+    }
+
+    private void RemoveProduct(int index)
+    {
+        Products.RemoveAt(index);
+        if (EditingIndex == index)
+        {
+            EditingIndex = -1;
+            EditingProduct = new();
+        }
+        else if (EditingIndex > index)
+        {
+            EditingIndex--;
+        }
+        ProductsChanged.InvokeAsync(Products);
+    }
+}

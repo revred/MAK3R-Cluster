@@ -1,0 +1,30 @@
+{
+  "name": "MAK3R - Digital Twin Platform",
+  "short_name": "MAK3R",
+  "id": "./",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0B0F14",
+  "theme_color": "#0B0F14",
+  "prefer_related_applications": false,
+  "description": "Progressive Digital Twin platform for manufacturers - unify ERP, shopfloor, and web catalog data",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    },
+    {
+      "src": "icon-192.png",
+      "type": "image/png", 
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\code\\MAK3R-Cluster\\libs\\MAK3R.Core\\MAK3R.Core.csproj": {}
+  },
+  "projects": {
+    "C:\\code\\MAK3R-Cluster\\libs\\MAK3R.Core\\MAK3R.Core.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\code\\MAK3R-Cluster\\libs\\MAK3R.Core\\MAK3R.Core.csproj",
+        "projectName": "MAK3R.Core",
+        "projectPath": "C:\\code\\MAK3R-Cluster\\libs\\MAK3R.Core\\MAK3R.Core.csproj",
+        "packagesPath": "C:\\Users\\revanur\\.nuget\\packages\\",
+        "outputPath": "C:\\code\\MAK3R-Cluster\\libs\\MAK3R.Core\\obj\\",
+        "projectStyle": "PackageReference",
+        "centralPackageVersionsManagementEnabled": true,
+        "CentralPackageTransitivePinningEnabled": true,
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\revanur\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net8.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net8.0": {
+            "targetAlias": "net8.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "centralPackageVersions": {
+            "AngleSharp": "1.1.2",
+            "Blazored.LocalStorage": "4.5.0",
+            "coverlet.collector": "6.0.2",
+            "CsvHelper": "33.0.1",
+            "ExcelDataReader": "3.7.0",
+            "ExcelDataReader.DataSet": "3.7.0",
+            "FluentAssertions": "6.12.2",
+            "FluentValidation": "11.10.0",
+            "FluentValidation.AspNetCore": "11.3.0",
+            "Microsoft.AspNetCore.Authentication.JwtBearer": "8.0.11",
+            "Microsoft.AspNetCore.Components.Web": "8.0.11",
+            "Microsoft.AspNetCore.Components.WebAssembly": "8.0.11",
+            "Microsoft.AspNetCore.Components.WebAssembly.Authentication": "8.0.11",
+            "Microsoft.AspNetCore.Components.WebAssembly.DevServer": "8.0.11",
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": "8.0.11",
+            "Microsoft.AspNetCore.Identity.UI": "8.0.11",
+            "Microsoft.AspNetCore.OpenApi": "8.0.11",
+            "Microsoft.AspNetCore.SignalR.Client": "8.0.11",
+            "Microsoft.EntityFrameworkCore.Design": "8.0.11",
+            "Microsoft.EntityFrameworkCore.Sqlite": "8.0.11",
+            "Microsoft.EntityFrameworkCore.Tools": "8.0.11",
+            "Microsoft.Extensions.Caching.Memory": "8.0.1",
+            "Microsoft.Extensions.Configuration.Abstractions": "8.0.0",
+            "Microsoft.Extensions.Configuration.Binder": "8.0.2",
+            "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2",
+            "Microsoft.Extensions.Hosting": "8.0.1",
+            "Microsoft.Extensions.Hosting.Abstractions": "8.0.1",
+            "Microsoft.Extensions.Logging.Abstractions": "8.0.2",
+            "Microsoft.NET.Test.Sdk": "17.11.1",
+            "Microsoft.Playwright": "1.49.0",
+            "MSTest": "3.6.3",
+            "MSTest.TestAdapter": "3.6.3",
+            "MSTest.TestFramework": "3.6.3",
+            "NRules": "0.9.5",
+            "OPCFoundation.NetStandard.Opc.Ua": "1.5.374.54",
+            "RestSharp": "112.1.0",
+            "Serilog": "4.1.0",
+            "Serilog.AspNetCore": "8.0.3",
+            "Serilog.Sinks.Console": "6.0.0",
+            "Serilog.Sinks.File": "6.0.0",
+            "Swashbuckle.AspNetCore": "6.8.1",
+            "Toolbelt.Blazor.HttpClientInterceptor": "10.2.0",
+            "Verify.Xunit": "28.3.2",
+            "WireMock.Net": "1.6.5",
+            "xunit": "2.9.2",
+            "xunit.runner.visualstudio": "2.8.2"
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

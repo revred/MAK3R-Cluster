@@ -1,0 +1,16 @@
+@inherits NavItemBase
+
+<a href="@Href" class="nav-item @(IsActive ? "active" : "")">
+    <div class="nav-item-content">
+        <span class="nav-icon material-symbols-outlined">@Icon</span>
+        <span class="nav-label">@Label</span>
+        @if (!string.IsNullOrEmpty(Badge))
+        {
+            <span class="nav-badge">@Badge</span>
+        }
+    </div>
+    @if (IsActive)
+    {
+        <div class="nav-indicator"></div>
+    }
+</a>

@@ -1,0 +1,115 @@
+/* Skeleton loading styles */
+.skeleton-card {
+    background-color: var(--mak3r-surface);
+    border: 1px solid var(--mak3r-border);
+    border-radius: var(--mak3r-radius);
+    padding: var(--mak3r-spacing-lg);
+    margin-bottom: var(--mak3r-spacing);
+    animation: skeleton-pulse 1.5s ease-in-out infinite alternate;
+}
+
+.skeleton-header {
+    display: flex;
+    align-items: center;
+    gap: var(--mak3r-spacing);
+    margin-bottom: var(--mak3r-spacing-lg);
+}
+
+.skeleton-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, var(--mak3r-panel) 25%, var(--mak3r-grid) 50%, var(--mak3r-panel) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+}
+
+.skeleton-text-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--mak3r-spacing-sm);
+}
+
+.skeleton-text {
+    height: 16px;
+    border-radius: var(--mak3r-radius-sm);
+    background: linear-gradient(90deg, var(--mak3r-panel) 25%, var(--mak3r-grid) 50%, var(--mak3r-panel) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+}
+
+.skeleton-text-title {
+    height: 20px;
+    width: 60%;
+}
+
+.skeleton-text-subtitle {
+    height: 14px;
+    width: 40%;
+}
+
+.skeleton-text-line {
+    width: 100%;
+    margin-bottom: var(--mak3r-spacing-sm);
+}
+
+.skeleton-text-short {
+    width: 75%;
+}
+
+.skeleton-content {
+    margin-bottom: var(--mak3r-spacing-lg);
+}
+
+.skeleton-actions {
+    display: flex;
+    gap: var(--mak3r-spacing);
+    justify-content: flex-end;
+}
+
+.skeleton-button {
+    height: 36px;
+    width: 80px;
+    border-radius: var(--mak3r-radius-sm);
+    background: linear-gradient(90deg, var(--mak3r-panel) 25%, var(--mak3r-grid) 50%, var(--mak3r-panel) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.5s infinite;
+}
+
+.skeleton-button-small {
+    width: 60px;
+}
+
+/* Animations */
+@keyframes skeleton-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@keyframes skeleton-pulse {
+    0% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0.7;
+    }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-card,
+    .skeleton-avatar,
+    .skeleton-text,
+    .skeleton-button {
+        animation: none;
+    }
+    
+    .skeleton-card {
+        opacity: 0.8;
+    }
+}

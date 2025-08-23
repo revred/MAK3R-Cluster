@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet new:*)",
+      "Bash(mkdir:*)",
+      "Bash(for lib in Core Identity Data DigitalTwin Connectors.Abstractions Connectors.Shopify Connectors.NetSuite Connectors.OPCUA Anomalies Content Ingestion Messaging Shared UI)",
+      "Bash(do dotnet new classlib -n MAK3R.$lib -f net8.0 -o MAK3R.$lib)",
+      "Bash(done)",
+      "Bash(dotnet sln add:*)",
+      "Bash(del libsMAK3R.CoreClass1.cs)",
+      "Bash(dotnet build)",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet run:*)",
+      "Bash(curl:*)",
+      "Bash(del libs/MAK3R.Connectors/Class1.cs)",
+      "Bash(dotnet build:*)",
+      "Bash(taskkill:*)",
+      "Bash(wmic process where:*)",
+      "Bash(move:*)",
+      "Bash(xcopy:*)",
+      "Bash(robocopy:*)",
+      "Bash(dotnet sln remove:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

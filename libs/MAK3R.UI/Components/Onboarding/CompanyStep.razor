@@ -1,0 +1,117 @@
+@using MAK3R.Shared.DTOs
+@using System.ComponentModel.DataAnnotations
+
+<div class="step-content">
+    <div class="step-header">
+        <h2>Company Information</h2>
+        <p class="text-muted">Tell us about your organization</p>
+    </div>
+
+    <div class="form-grid">
+        <div class="form-group full-width">
+            <label for="company-name" class="required">Company Name</label>
+            <input id="company-name" type="text" @bind="CompanyName" @bind:event="oninput" 
+                   placeholder="Enter your company name" required />
+            @if (ValidationErrors.Contains("Company name is required"))
+            {
+                <span class="validation-error">Company name is required</span>
+            }
+        </div>
+
+        <div class="form-group">
+            <label for="registration-id">Registration ID</label>
+            <input id="registration-id" type="text" @bind="RegistrationId" 
+                   placeholder="e.g., CIN, Registration Number" />
+        </div>
+
+        <div class="form-group">
+            <label for="tax-id">Tax ID</label>
+            <input id="tax-id" type="text" @bind="TaxId" 
+                   placeholder="e.g., GST, VAT, EIN" />
+        </div>
+
+        <div class="form-group">
+            <label for="industry">Industry</label>
+            <select id="industry" @bind="Industry">
+                <option value="">Select industry</option>
+                <option value="Manufacturing">Manufacturing</option>
+                <option value="Automotive">Automotive</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Aerospace">Aerospace</option>
+                <option value="Food & Beverage">Food & Beverage</option>
+                <option value="Pharmaceutical">Pharmaceutical</option>
+                <option value="Textiles">Textiles</option>
+                <option value="Machinery">Machinery</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="website">Website</label>
+            <input id="website" type="url" @bind="Website" 
+                   placeholder="https://yourcompany.com" />
+        </div>
+
+        <div class="form-group full-width">
+            <label for="address">Address</label>
+            <textarea id="address" @bind="Address" rows="3" 
+                     placeholder="Enter your company's primary address"></textarea>
+        </div>
+    </div>
+
+    @if (ValidationErrors.Any())
+    {
+        <div class="validation-summary">
+            <h4>Please fix the following issues:</h4>
+            <ul>
+                @foreach (var error in ValidationErrors)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public CompanyInfo Company { get; set; } = new();
+    [Parameter] public EventCallback<CompanyInfo> CompanyChanged { get; set; }
+    [Parameter] public bool IsValid { get; set; }
+    [Parameter] public List<string> ValidationErrors { get; set; } = new();
+
+    private string CompanyName
+    {
+        get => Company.Name;
+        set { Company.Name = value; CompanyChanged.InvokeAsync(Company); }
+    }
+
+    private string? RegistrationId
+    {
+        get => Company.RegistrationId;
+        set { Company.RegistrationId = value; CompanyChanged.InvokeAsync(Company); }
+    }
+
+    private string? TaxId
+    {
+        get => Company.TaxId;
+        set { Company.TaxId = value; CompanyChanged.InvokeAsync(Company); }
+    }
+
+    private string? Industry
+    {
+        get => Company.Industry;
+        set { Company.Industry = value; CompanyChanged.InvokeAsync(Company); }
+    }
+
+    private string? Website
+    {
+        get => Company.Website;
+        set { Company.Website = value; CompanyChanged.InvokeAsync(Company); }
+    }
+
+    private string? Address
+    {
+        get => Company.Address;
+        set { Company.Address = value; CompanyChanged.InvokeAsync(Company); }
+    }
+}

@@ -1,0 +1,209 @@
+@using MAK3R.Shared.DTOs
+
+<div class="step-content">
+    <div class="step-header">
+        <h2>Machines & Equipment</h2>
+        <p class="text-muted">Add your manufacturing equipment and machinery (optional)</p>
+    </div>
+
+    @if (!Machines.Any())
+    {
+        <div class="empty-state">
+            <span class="material-symbols-outlined">precision_manufacturing</span>
+            <h3>No machines added yet</h3>
+            <p>You can skip this step or add machines now</p>
+            <button @onclick="AddMachine" class="primary">
+                <span class="material-symbols-outlined">add</span>
+                Add First Machine
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="machines-list">
+            @foreach (var (machine, index) in Machines.Select((m, i) => (m, i)))
+            {
+                <div class="machine-card @(EditingIndex == index ? "editing" : "")">
+                    @if (EditingIndex == index)
+                    {
+                        <div class="machine-form">
+                            <div class="form-header">
+                                <h4>@(index == Machines.Count - 1 && string.IsNullOrEmpty(machine.Name) ? "New Machine" : "Edit Machine")</h4>
+                                <div class="form-actions">
+                                    <button class="icon-button success" @onclick="() => SaveMachine(index)">
+                                        <span class="material-symbols-outlined">check</span>
+                                    </button>
+                                    <button class="icon-button danger" @onclick="() => CancelEdit(index)">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Machine Name <span class="required">*</span></label>
+                                    <input type="text" @bind="EditingMachine.Name" @bind:event="oninput" 
+                                           placeholder="e.g., CNC Mill #1" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Site Location <span class="required">*</span></label>
+                                    <select @bind="EditingMachine.SiteName">
+                                        <option value="">Select site</option>
+                                        @foreach (var site in Sites)
+                                        {
+                                            <option value="@site.Name">@site.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Make/Brand</label>
+                                    <input type="text" @bind="EditingMachine.Make" 
+                                           placeholder="e.g., Haas, DMG Mori" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Model</label>
+                                    <input type="text" @bind="EditingMachine.Model" 
+                                           placeholder="e.g., VF-2SS" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Serial Number</label>
+                                    <input type="text" @bind="EditingMachine.SerialNumber" 
+                                           placeholder="Machine serial number" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>OPC UA Node ID</label>
+                                    <input type="text" @bind="EditingMachine.OpcUaNode" 
+                                           placeholder="e.g., ns=2;i=1001" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="machine-display">
+                            <div class="machine-info">
+                                <div class="machine-header">
+                                    <h4>@machine.Name</h4>
+                                    <div class="machine-actions">
+                                        <button class="icon-button secondary" @onclick="() => EditMachine(index)">
+                                            <span class="material-symbols-outlined">edit</span>
+                                        </button>
+                                        <button class="icon-button danger" @onclick="() => RemoveMachine(index)">
+                                            <span class="material-symbols-outlined">delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="machine-details">
+                                    <div class="detail-item">
+                                        <span class="material-symbols-outlined">location_on</span>
+                                        <span>@machine.SiteName</span>
+                                    </div>
+                                    
+                                    @if (!string.IsNullOrEmpty(machine.Make) || !string.IsNullOrEmpty(machine.Model))
+                                    {
+                                        <div class="detail-item">
+                                            <span class="material-symbols-outlined">info</span>
+                                            <span>@($"{machine.Make}{(!string.IsNullOrEmpty(machine.Make) && !string.IsNullOrEmpty(machine.Model) ? " " : "")}{machine.Model}")</span>
+                                        </div>
+                                    }
+                                    
+                                    @if (!string.IsNullOrEmpty(machine.SerialNumber))
+                                    {
+                                        <div class="detail-item">
+                                            <span class="material-symbols-outlined">tag</span>
+                                            <span>S/N: @machine.SerialNumber</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="add-machine-section">
+            <button @onclick="AddMachine" class="secondary">
+                <span class="material-symbols-outlined">add</span>
+                Add Another Machine
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public List<MachineInfo> Machines { get; set; } = new();
+    [Parameter] public EventCallback<List<MachineInfo>> MachinesChanged { get; set; }
+    [Parameter] public List<SiteInfo> Sites { get; set; } = new();
+    [Parameter] public bool IsValid { get; set; }
+    [Parameter] public List<string> ValidationErrors { get; set; } = new();
+
+    private int EditingIndex = -1;
+    private MachineInfo EditingMachine = new();
+
+    private void AddMachine()
+    {
+        if (!Sites.Any())
+        {
+            return;
+        }
+
+        var newMachine = new MachineInfo();
+        Machines.Add(newMachine);
+        EditingIndex = Machines.Count - 1;
+        EditingMachine = newMachine;
+        MachinesChanged.InvokeAsync(Machines);
+    }
+
+    private void EditMachine(int index)
+    {
+        EditingIndex = index;
+        EditingMachine = Machines[index];
+    }
+
+    private void SaveMachine(int index)
+    {
+        if (string.IsNullOrWhiteSpace(EditingMachine.Name) || string.IsNullOrWhiteSpace(EditingMachine.SiteName))
+        {
+            return;
+        }
+
+        Machines[index] = EditingMachine;
+        EditingIndex = -1;
+        EditingMachine = new();
+        MachinesChanged.InvokeAsync(Machines);
+    }
+
+    private void CancelEdit(int index)
+    {
+        if (index == Machines.Count - 1 && string.IsNullOrEmpty(Machines[index].Name))
+        {
+            Machines.RemoveAt(index);
+        }
+        
+        EditingIndex = -1;
+        EditingMachine = new();
+        MachinesChanged.InvokeAsync(Machines);
+    }
+
+    private void RemoveMachine(int index)
+    {
+        Machines.RemoveAt(index);
+        if (EditingIndex == index)
+        {
+            EditingIndex = -1;
+            EditingMachine = new();
+        }
+        else if (EditingIndex > index)
+        {
+            EditingIndex--;
+        }
+        MachinesChanged.InvokeAsync(Machines);
+    }
+}

@@ -1,0 +1,97 @@
+@inherits AppShellBase
+
+<div class="app-shell">
+    <nav class="nav-rail">
+        <div class="nav-header">
+            <div class="logo">
+                <span class="logo-text">MAK3R</span>
+                <span class="env-badge">@Environment</span>
+            </div>
+        </div>
+        
+        <div class="nav-items">
+            @foreach (var item in NavigationItems)
+            {
+                <NavItem 
+                    Icon="@item.Icon" 
+                    Label="@item.Label" 
+                    Href="@item.Href" 
+                    IsActive="@IsActive(item.Href)"
+                    Badge="@item.Badge" />
+            }
+        </div>
+
+        <div class="nav-footer">
+            <NavItem 
+                Icon="settings" 
+                Label="Settings" 
+                Href="/admin" 
+                IsActive="@IsActive("/admin")" />
+            
+            @if (IsAuthenticated)
+            {
+                <div class="user-info">
+                    <div class="user-avatar">@GetUserInitials()</div>
+                    <div class="user-details">
+                        <span class="user-name">@UserName</span>
+                        <span class="user-role">@UserRole</span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <NavItem 
+                    Icon="login" 
+                    Label="Sign In" 
+                    Href="/authentication/login" />
+            }
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header class="top-bar">
+            <div class="breadcrumb">
+                @if (Breadcrumbs?.Count > 0)
+                {
+                    @for (int i = 0; i < Breadcrumbs.Count; i++)
+                    {
+                        var breadcrumb = Breadcrumbs[i];
+                        <span class="breadcrumb-item @(i == Breadcrumbs.Count - 1 ? "current" : "")">
+                            @if (i < Breadcrumbs.Count - 1)
+                            {
+                                <a href="@breadcrumb.Href">@breadcrumb.Label</a>
+                            }
+                            else
+                            {
+                                @breadcrumb.Label
+                            }
+                        </span>
+                        @if (i < Breadcrumbs.Count - 1)
+                        {
+                            <span class="breadcrumb-separator">/</span>
+                        }
+                    }
+                }
+            </div>
+            
+            <div class="top-bar-actions">
+                <div class="connection-status @(IsOnline ? "online" : "offline")">
+                    <span class="status-dot"></span>
+                    <span class="status-text">@(IsOnline ? "Online" : "Offline")</span>
+                </div>
+                
+                @if (PendingSyncCount > 0)
+                {
+                    <div class="sync-status">
+                        <span class="sync-icon">↻</span>
+                        <span class="sync-count">@PendingSyncCount pending</span>
+                    </div>
+                }
+            </div>
+        </header>
+
+        <div class="page-content">
+            @ChildContent
+        </div>
+    </main>
+</div>

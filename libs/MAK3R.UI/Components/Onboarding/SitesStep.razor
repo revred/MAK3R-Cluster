@@ -1,0 +1,189 @@
+@using MAK3R.Shared.DTOs
+
+<div class="step-content">
+    <div class="step-header">
+        <h2>Sites & Locations</h2>
+        <p class="text-muted">Add your manufacturing sites, offices, or warehouses</p>
+    </div>
+
+    @if (!Sites.Any())
+    {
+        <div class="empty-state">
+            <span class="material-symbols-outlined">location_on</span>
+            <h3>No sites added yet</h3>
+            <p>Add your first site to get started</p>
+            <button @onclick="AddSite" class="primary">
+                <span class="material-symbols-outlined">add</span>
+                Add First Site
+            </button>
+        </div>
+    }
+    else
+    {
+        <div class="sites-list">
+            @foreach (var (site, index) in Sites.Select((s, i) => (s, i)))
+            {
+                <div class="site-card @(EditingIndex == index ? "editing" : "")">
+                    @if (EditingIndex == index)
+                    {
+                        <div class="site-form">
+                            <div class="form-header">
+                                <h4>@(index == Sites.Count - 1 && string.IsNullOrEmpty(site.Name) ? "New Site" : "Edit Site")</h4>
+                                <div class="form-actions">
+                                    <button class="icon-button success" @onclick="() => SaveSite(index)">
+                                        <span class="material-symbols-outlined">check</span>
+                                    </button>
+                                    <button class="icon-button danger" @onclick="() => CancelEdit(index)">
+                                        <span class="material-symbols-outlined">close</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group full-width">
+                                    <label>Site Name <span class="required">*</span></label>
+                                    <input type="text" @bind="EditingSite.Name" @bind:event="oninput" 
+                                           placeholder="e.g., Mumbai Manufacturing Hub" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>City</label>
+                                    <input type="text" @bind="EditingSite.City" 
+                                           placeholder="e.g., Mumbai" />
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Country</label>
+                                    <input type="text" @bind="EditingSite.Country" 
+                                           placeholder="e.g., India" />
+                                </div>
+                                
+                                <div class="form-group full-width">
+                                    <label>Address</label>
+                                    <textarea @bind="EditingSite.Address" rows="2" 
+                                             placeholder="Full address of this site"></textarea>
+                                </div>
+                                
+                                <div class="form-group full-width">
+                                    <label>Description</label>
+                                    <textarea @bind="EditingSite.Description" rows="2" 
+                                             placeholder="Brief description of this site's purpose"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="site-display">
+                            <div class="site-info">
+                                <div class="site-header">
+                                    <h4>@site.Name</h4>
+                                    <div class="site-actions">
+                                        <button class="icon-button secondary" @onclick="() => EditSite(index)">
+                                            <span class="material-symbols-outlined">edit</span>
+                                        </button>
+                                        <button class="icon-button danger" @onclick="() => RemoveSite(index)">
+                                            <span class="material-symbols-outlined">delete</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="site-details">
+                                    @if (!string.IsNullOrEmpty(site.City) || !string.IsNullOrEmpty(site.Country))
+                                    {
+                                        <div class="detail-item">
+                                            <span class="material-symbols-outlined">location_on</span>
+                                            <span>@($"{site.City}{(!string.IsNullOrEmpty(site.City) && !string.IsNullOrEmpty(site.Country) ? ", " : "")}{site.Country}")</span>
+                                        </div>
+                                    }
+                                    
+                                    @if (!string.IsNullOrEmpty(site.Description))
+                                    {
+                                        <div class="detail-item">
+                                            <span class="material-symbols-outlined">description</span>
+                                            <span>@site.Description</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+
+        <div class="add-site-section">
+            <button @onclick="AddSite" class="secondary">
+                <span class="material-symbols-outlined">add</span>
+                Add Another Site
+            </button>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public List<SiteInfo> Sites { get; set; } = new();
+    [Parameter] public EventCallback<List<SiteInfo>> SitesChanged { get; set; }
+    [Parameter] public bool IsValid { get; set; }
+    [Parameter] public List<string> ValidationErrors { get; set; } = new();
+
+    private int EditingIndex = -1;
+    private SiteInfo EditingSite = new();
+
+    private void AddSite()
+    {
+        var newSite = new SiteInfo();
+        Sites.Add(newSite);
+        EditingIndex = Sites.Count - 1;
+        EditingSite = newSite;
+        SitesChanged.InvokeAsync(Sites);
+    }
+
+    private void EditSite(int index)
+    {
+        EditingIndex = index;
+        EditingSite = Sites[index];
+    }
+
+    private void SaveSite(int index)
+    {
+        if (string.IsNullOrWhiteSpace(EditingSite.Name))
+        {
+            // Don't save invalid site
+            return;
+        }
+
+        Sites[index] = EditingSite;
+        EditingIndex = -1;
+        EditingSite = new();
+        SitesChanged.InvokeAsync(Sites);
+    }
+
+    private void CancelEdit(int index)
+    {
+        if (index == Sites.Count - 1 && string.IsNullOrEmpty(Sites[index].Name))
+        {
+            // Remove the new empty site
+            Sites.RemoveAt(index);
+        }
+        
+        EditingIndex = -1;
+        EditingSite = new();
+        SitesChanged.InvokeAsync(Sites);
+    }
+
+    private void RemoveSite(int index)
+    {
+        Sites.RemoveAt(index);
+        if (EditingIndex == index)
+        {
+            EditingIndex = -1;
+            EditingSite = new();
+        }
+        else if (EditingIndex > index)
+        {
+            EditingIndex--;
+        }
+        SitesChanged.InvokeAsync(Sites);
+    }
+}

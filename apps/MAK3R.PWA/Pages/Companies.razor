@@ -1,0 +1,91 @@
+@page "/companies"
+@using MAK3R.Shared.DTOs
+@using MAK3R.UI.Services
+@inject HttpClient Http
+@inject IProgressiveLoadingService ProgressiveLoading
+
+<PageTitle>Companies - MAK3R</PageTitle>
+
+<div class="page-container">
+    <div class="page-header">
+        <h1>Companies</h1>
+        <p class="text-muted">Manage your organization's digital twins</p>
+    </div>
+
+    <div class="page-content">
+        <ProgressiveList TItem="CompanyDto" 
+                        ItemTemplate="CompanyCardTemplate" 
+                        DataLoader="LoadCompanies" 
+                        PageSize="10"
+                        SkeletonCount="6" />
+    </div>
+</div>
+
+@code {
+    private RenderFragment<CompanyDto> CompanyCardTemplate => company => 
+    @<div class="company-card">
+        <div class="card-header">
+            <h3>@company.Name</h3>
+            <span class="company-industry">@company.Industry</span>
+        </div>
+        <div class="card-content">
+            @if (!string.IsNullOrEmpty(company.RegistrationId))
+            {
+                <div class="detail-item">
+                    <span class="label">Registration:</span>
+                    <span class="value">@company.RegistrationId</span>
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(company.TaxId))
+            {
+                <div class="detail-item">
+                    <span class="label">Tax ID:</span>
+                    <span class="value">@company.TaxId</span>
+                </div>
+            }
+            @if (!string.IsNullOrEmpty(company.Website))
+            {
+                <div class="detail-item">
+                    <span class="label">Website:</span>
+                    <a href="@company.Website" class="value link" target="_blank">@company.Website</a>
+                </div>
+            }
+        </div>
+        <div class="card-actions">
+            <button class="btn secondary">View Details</button>
+            <button class="btn primary">Manage</button>
+        </div>
+    </div>;
+
+    private async ValueTask<IEnumerable<CompanyDto>> LoadCompanies(int page, int size, CancellationToken cancellationToken)
+    {
+        try
+        {
+            // Add authentication header if we have a token
+            var response = await Http.GetAsync($"api/companies?page={page}&size={size}", cancellationToken);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                // For demo purposes, return demo data if API fails
+                if (page == 0)
+                {
+                    return new List<CompanyDto>
+                    {
+                        new(Guid.NewGuid(), "Contoso Gears Pvt Ltd", "CIN-U12345MH2010PTC123456", "GST-27ABCDE1234F1Z5", "Manufacturing", "https://contosogears.com", DateTime.Now.AddMonths(-6), DateTime.Now),
+                        new(Guid.NewGuid(), "Acme Manufacturing Inc", "EIN-12-3456789", "TAX-987654321", "Industrial", "https://acme-mfg.com", DateTime.Now.AddMonths(-12), DateTime.Now),
+                        new(Guid.NewGuid(), "Tech Solutions Ltd", "REG-TS2023001", "VAT-GB123456789", "Technology", "https://techsol.co.uk", DateTime.Now.AddMonths(-3), DateTime.Now),
+                    };
+                }
+                return Array.Empty<CompanyDto>();
+            }
+            
+            var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<CompanyDto>>(cancellationToken);
+            return pagedResult?.Items ?? Array.Empty<CompanyDto>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading companies: {ex.Message}");
+            return Array.Empty<CompanyDto>();
+        }
+    }
+}
