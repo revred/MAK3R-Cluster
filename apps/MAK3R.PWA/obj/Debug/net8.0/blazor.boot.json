@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "MAK3R.PWA",
   "resources": {
-    "hash": "sha256-H0gfKYcvGsljIw9lWjmhtzFo02MaY+Hd/zPG3wwZ8YY=",
+    "hash": "sha256-aiU1hXNXhcwg+r41tnVgpiD9ObQ8ik2MOSz/vm1c+dE=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-O/NCYcAN9uPocD7ns7AzF/cqx7f5vL1PTJCQs0vEXyk="
     },
@@ -223,18 +223,18 @@
       "mscorlib.wasm": "sha256-RLW/7NVuhoPfq151II3kX2kWHgBwQgpCw9aemQNg3to=",
       "netstandard.wasm": "sha256-lAg5WvTiA8wbsIwlr51xh0YWpXT9F5EX3Cnv+11O/mU=",
       "System.Private.CoreLib.wasm": "sha256-3O3muuRQwoLRecYRjfIFWUURvTjP4EmD2O8wYg2UDNY=",
-      "MAK3R.Connectors.Abstractions.wasm": "sha256-mqNuTsJubR+gwYQ4fCRI/TCZ5XMsGboYFBmuGi38IOk=",
-      "MAK3R.Core.wasm": "sha256-qGU03/aB2sLbrTUq0g/xGaL1hs5FQP3XQyIXX849kcE=",
-      "MAK3R.Shared.wasm": "sha256-6B//wo4puNrIiWQ47DtRTkPU+ZuybyVUC7/hQN2KstQ=",
-      "MAK3R.UI.wasm": "sha256-osgmOYDjHv497dEtcg+Ez9dLeKybTyDsF6MBLiDxinI=",
-      "MAK3R.PWA.wasm": "sha256-IqXBLkg9dpS21onmjL/VSNRY7j8kicMPJ8B5uIPa3oU="
+      "MAK3R.Connectors.Abstractions.wasm": "sha256-rIXw8a1vQwNjKrWE2N/cxKvnskYx2D9ny5Uc/Sth28c=",
+      "MAK3R.Core.wasm": "sha256-vhaNchnuwBeNKifbQTrFThql9pvaawcsxkoZcsWr0LQ=",
+      "MAK3R.Shared.wasm": "sha256-qH5nrjif8iMa3RuGghpsHNMdcBK587QKgLRm4aKlfFs=",
+      "MAK3R.UI.wasm": "sha256-pyC0z0I99zFw+ldxHKA3eZ+D34o1pwt4WWaDaZJnCLM=",
+      "MAK3R.PWA.wasm": "sha256-Bng3oL/NPKIkidQwAU6nQPvcoqTCfUFIWjiIcV/Qlj8="
     },
     "pdb": {
-      "MAK3R.Shared.pdb": "sha256-mAQf9MJOq6NGQIwBQHM+MXkAVdDE0lGd4jWQdy4UxeU=",
-      "MAK3R.UI.pdb": "sha256-NIGWiyBSjddQ212i9+IHQzmsojJHXcuerqdexK7Kiig=",
-      "MAK3R.Connectors.Abstractions.pdb": "sha256-OVrFxuLybzF8RByjl1qcQoQoFSAihYpL437C07LIeLw=",
-      "MAK3R.Core.pdb": "sha256-5pFlPBaSMTIG2Zap6PTeA8PUEPO/lXoEHT8APyM1J00=",
-      "MAK3R.PWA.pdb": "sha256-bFc/qQNtG34aIV0Orc2eNY8heCx6RZKUzqVg5dl5BX8="
+      "MAK3R.Shared.pdb": "sha256-M56iW32wBrqZxUJM1sWW3AtXFSqFcu5Sq62znC5aLKE=",
+      "MAK3R.UI.pdb": "sha256-68H34skXih5zOLerRtr1UFkw9MY3gVMAvNyOborHsD0=",
+      "MAK3R.Connectors.Abstractions.pdb": "sha256-QpOErWfcnhW/tsrrPLrGN2PHScIUQKZT7C8vikf/D6k=",
+      "MAK3R.Core.pdb": "sha256-M9i0lSUPeHaw21d8BEN5VI9r9PRNuHYByxUIbd74yB4=",
+      "MAK3R.PWA.pdb": "sha256-t43VzGH7kYlHzKAq8I+rUqpOZl2u2VoN6neA88TEU8k="
     }
   },
   "cacheBootResources": true,

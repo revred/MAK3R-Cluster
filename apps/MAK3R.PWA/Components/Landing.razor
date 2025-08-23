@@ -1,0 +1,96 @@
+@page "/app"
+@layout MainLayout
+
+<section class="hero">
+    <div class="hero__content">
+        <h1>MAK3R • Manufacturing Command</h1>
+        <p class="sub">Unify ERP, shop-floor, and product data into a living Digital Twin.</p>
+        <div class="cta">
+            <a class="btn btn-primary" href="/onboard">Start Onboarding</a>
+            <a class="btn btn-ghost" href="/connectors">Live Connectors</a>
+        </div>
+        <ul class="hero__badges">
+            <li>OPC UA Ready</li>
+            <li>Shopify/NetSuite</li>
+            <li>PWA Offline</li>
+            <li>Real-time Analytics</li>
+        </ul>
+    </div>
+    <div class="hero__viz">
+        <MachineTicker />
+    </div>
+</section>
+
+<section class="grid">
+    <StatTile Title="Sites" Value="2" Hint="Demo Active" />
+    <StatTile Title="Machines" Value="3" Hint="Streaming" />
+    <StatTile Title="Products" Value="8" Hint="Catalog" />
+    <StatTile Title="Connectors" Value="0" Hint="Available" />
+</section>
+
+<section class="panels">
+    <div class="panel">
+        <h2>Digital Twin Status</h2>
+        <div class="twin-status">
+            <div class="twin-item">
+                <span class="status-dot success"></span>
+                <span>Contoso Gears Ltd</span>
+                <span class="twin-meta">Complete</span>
+            </div>
+            <div class="twin-item">
+                <span class="status-dot warn"></span>
+                <span>Site Validation</span>
+                <span class="twin-meta">2 gaps</span>
+            </div>
+            <div class="twin-item">
+                <span class="status-dot success"></span>
+                <span>Machine Telemetry</span>
+                <span class="twin-meta">Live</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="panel">
+        <h2>Connector Hub</h2>
+        <AnomalyPreview />
+    </div>
+</section>
+
+<section class="features">
+    <div class="feature-grid">
+        <div class="feature-card">
+            <div class="feature-icon">🏭</div>
+            <h3>Digital Twin Orchestration</h3>
+            <p>Progressive onboarding wizard creates comprehensive digital twins from fragmented manufacturing data.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔌</div>
+            <h3>MCP Connector Architecture</h3>
+            <p>Extensible connector system integrates ERP, Shopify, OPC UA, and custom data sources without recompilation.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Real-time Machine Data</h3>
+            <p>Live telemetry streams from shop floor via OPC UA with anomaly detection and alerting.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3>Anomaly Workbench</h3>
+            <p>Rule-based detection engine identifies data gaps, pricing issues, and operational variances.</p>
+        </div>
+    </div>
+</section>
+
+<footer class="landing-footer">
+    <div class="footer-content">
+        <div class="footer-brand">
+            <strong>MAK3R.ai</strong>
+            <span>Manufacturing Intelligence Platform</span>
+        </div>
+        <div class="footer-links">
+            <a href="/companies">Companies</a>
+            <a href="/connectors">Connectors</a>
+            <a href="/api/swagger" target="_blank">API Docs</a>
+        </div>
+    </div>
+</footer>

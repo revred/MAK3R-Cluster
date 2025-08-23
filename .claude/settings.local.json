@@ -21,7 +21,13 @@
       "Bash(robocopy:*)",
       "Bash(dotnet sln remove:*)",
       "Bash(git init:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(start http://localhost:5223)",
+      "Bash(start http://localhost:5225)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

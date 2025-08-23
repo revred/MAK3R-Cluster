@@ -1,0 +1,14 @@
+<div class="stat">
+    <div class="stat-value">@Value</div>
+    <div class="stat-title">@Title</div>
+    @if (!string.IsNullOrWhiteSpace(Hint))
+    {
+        <div class="stat-hint">@Hint</div>
+    }
+</div>
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Value { get; set; } = "—";
+    [Parameter] public string? Hint { get; set; }
+}

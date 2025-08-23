@@ -1,0 +1,763 @@
+@page "/demo"
+@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+@using MAK3R.Shared.DTOs
+@using System.Timers
+@implements IDisposable
+
+<PageTitle>MAK3R Live Demo</PageTitle>
+
+<div class="demo-banner">
+    <span class="demo-badge">DEMO MODE</span>
+    <span class="demo-text">This is simulated data. Sign in for your real manufacturing data.</span>
+    <a href="/marketing" class="demo-cta">Request Full Access →</a>
+</div>
+
+<div class="dashboard-container">
+    <!-- Stats Overview -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Active Sites</div>
+            <div class="stat-value">@_activeSites</div>
+            <div class="stat-change positive">+2 this month</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Machines Online</div>
+            <div class="stat-value">@_machinesOnline</div>
+            <div class="stat-change">@_machinePercentage% capacity</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Products</div>
+            <div class="stat-value">@_productCount</div>
+            <div class="stat-change positive">+18 SKUs</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Anomalies</div>
+            <div class="stat-value">@_anomalyCount</div>
+            <div class="stat-change @(_anomalyCount > 5 ? "negative" : "")">@(_anomalyCount > 5 ? "Action required" : "Within tolerance")</div>
+        </div>
+    </div>
+
+    <!-- Digital Twin Status -->
+    <div class="section-card">
+        <h2>Digital Twin Status</h2>
+        <div class="twin-grid">
+            <div class="twin-card">
+                <div class="twin-header">
+                    <span class="twin-name">Contoso Gears Ltd</span>
+                    <span class="status-badge success">Complete</span>
+                </div>
+                <div class="twin-stats">
+                    <div class="twin-stat">
+                        <span class="label">Sites</span>
+                        <span class="value">3</span>
+                    </div>
+                    <div class="twin-stat">
+                        <span class="label">Machines</span>
+                        <span class="value">12</span>
+                    </div>
+                    <div class="twin-stat">
+                        <span class="label">Products</span>
+                        <span class="value">156</span>
+                    </div>
+                    <div class="twin-stat">
+                        <span class="label">Connectors</span>
+                        <span class="value">4</span>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%"></div>
+                </div>
+            </div>
+            <div class="twin-card">
+                <div class="twin-header">
+                    <span class="twin-name">Fabrikam Industries</span>
+                    <span class="status-badge warning">In Progress</span>
+                </div>
+                <div class="twin-stats">
+                    <div class="twin-stat">
+                        <span class="label">Sites</span>
+                        <span class="value">2</span>
+                    </div>
+                    <div class="twin-stat">
+                        <span class="label">Machines</span>
+                        <span class="value">8</span>
+                    </div>
+                    <div class="twin-stat">
+                        <span class="label">Products</span>
+                        <span class="value">89</span>
+                    </div>
+                    <div class="twin-stat">
+                        <span class="label">Connectors</span>
+                        <span class="value">2</span>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 65%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Machine Telemetry -->
+    <div class="section-card">
+        <h2>Live Machine Telemetry</h2>
+        <div class="telemetry-grid">
+            @foreach (var machine in _machines)
+            {
+                <div class="machine-card @(machine.Status == "Running" ? "running" : machine.Status == "Idle" ? "idle" : "maintenance")">
+                    <div class="machine-header">
+                        <span class="machine-id">@machine.Id</span>
+                        <span class="status-dot"></span>
+                    </div>
+                    <div class="machine-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Status</span>
+                            <span class="metric-value">@machine.Status</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Temp</span>
+                            <span class="metric-value">@machine.Temperature°C</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">RPM</span>
+                            <span class="metric-value">@machine.RPM</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Efficiency</span>
+                            <span class="metric-value">@machine.Efficiency%</span>
+                        </div>
+                    </div>
+                    <div class="machine-chart">
+                        <div class="mini-chart" style="height: @(machine.Efficiency)%"></div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Anomaly Detection -->
+    <div class="section-card">
+        <h2>Anomaly Detection</h2>
+        <div class="anomaly-list">
+            @foreach (var anomaly in _anomalies)
+            {
+                <div class="anomaly-item @anomaly.Severity.ToLower()">
+                    <div class="anomaly-icon">
+                        @if (anomaly.Severity == "High") { <span>⚠️</span> }
+                        else if (anomaly.Severity == "Medium") { <span>⚡</span> }
+                        else { <span>ℹ️</span> }
+                    </div>
+                    <div class="anomaly-details">
+                        <div class="anomaly-message">@anomaly.Message</div>
+                        <div class="anomaly-meta">
+                            <span class="anomaly-source">@anomaly.Source</span>
+                            <span class="anomaly-time">@anomaly.Time</span>
+                        </div>
+                    </div>
+                    <button class="anomaly-action">Investigate</button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Connector Status -->
+    <div class="section-card">
+        <h2>Connector Status</h2>
+        <div class="connector-grid">
+            <div class="connector-card active">
+                <div class="connector-icon">🔌</div>
+                <div class="connector-name">OPC UA</div>
+                <div class="connector-status">Connected</div>
+                <div class="connector-stats">
+                    <span>12 machines</span>
+                    <span>2.4k msgs/min</span>
+                </div>
+            </div>
+            <div class="connector-card active">
+                <div class="connector-icon">🛍️</div>
+                <div class="connector-name">Shopify</div>
+                <div class="connector-status">Syncing</div>
+                <div class="connector-stats">
+                    <span>156 products</span>
+                    <span>Last: 2 min ago</span>
+                </div>
+            </div>
+            <div class="connector-card active">
+                <div class="connector-icon">📊</div>
+                <div class="connector-name">NetSuite</div>
+                <div class="connector-status">Connected</div>
+                <div class="connector-stats">
+                    <span>3 companies</span>
+                    <span>89 orders today</span>
+                </div>
+            </div>
+            <div class="connector-card inactive">
+                <div class="connector-icon">📁</div>
+                <div class="connector-name">File Import</div>
+                <div class="connector-status">Available</div>
+                <div class="connector-stats">
+                    <span>CSV/Excel</span>
+                    <span>Configure →</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .demo-banner {
+        background: linear-gradient(90deg, #1677ff, #3DA8FF);
+        padding: 12px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: white;
+        font-size: 14px;
+    }
+
+    .demo-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4px 12px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+
+    .demo-cta {
+        margin-left: auto;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 6px 12px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .demo-cta:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .dashboard-container {
+        padding: 24px;
+        background: var(--bg);
+        min-height: calc(100vh - 48px);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: var(--panel);
+        border: 1px solid var(--grid);
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    .stat-label {
+        color: var(--muted);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 8px;
+    }
+
+    .stat-change {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .stat-change.positive {
+        color: var(--success);
+    }
+
+    .stat-change.negative {
+        color: var(--danger);
+    }
+
+    .section-card {
+        background: var(--panel);
+        border: 1px solid var(--grid);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+
+    .section-card h2 {
+        margin: 0 0 20px;
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .twin-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .twin-card {
+        background: rgba(30, 38, 49, 0.5);
+        border: 1px solid var(--grid);
+        border-radius: 12px;
+        padding: 20px;
+    }
+
+    .twin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+
+    .twin-name {
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .status-badge.success {
+        background: rgba(43, 217, 159, 0.2);
+        color: var(--success);
+    }
+
+    .status-badge.warning {
+        background: rgba(255, 200, 87, 0.2);
+        color: var(--warn);
+    }
+
+    .twin-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .twin-stat {
+        text-align: center;
+    }
+
+    .twin-stat .label {
+        display: block;
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 4px;
+    }
+
+    .twin-stat .value {
+        display: block;
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .progress-bar {
+        height: 4px;
+        background: var(--grid);
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #1677ff, #3DA8FF);
+        transition: width 0.3s;
+    }
+
+    .telemetry-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+    }
+
+    .machine-card {
+        background: rgba(30, 38, 49, 0.5);
+        border: 1px solid var(--grid);
+        border-radius: 12px;
+        padding: 16px;
+        transition: all 0.3s;
+    }
+
+    .machine-card.running {
+        border-color: rgba(43, 217, 159, 0.3);
+    }
+
+    .machine-card.idle {
+        border-color: rgba(255, 200, 87, 0.3);
+    }
+
+    .machine-card.maintenance {
+        border-color: rgba(255, 107, 107, 0.3);
+    }
+
+    .machine-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .machine-id {
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+    }
+
+    .machine-card.idle .status-dot {
+        background: var(--warn);
+    }
+
+    .machine-card.maintenance .status-dot {
+        background: var(--danger);
+    }
+
+    .machine-metrics {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .metric {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .metric-label {
+        font-size: 10px;
+        color: var(--muted);
+        text-transform: uppercase;
+    }
+
+    .metric-value {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .machine-chart {
+        height: 40px;
+        background: var(--grid);
+        border-radius: 4px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .mini-chart {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(180deg, #3DA8FF, #1677ff);
+        transition: height 0.5s;
+    }
+
+    .anomaly-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .anomaly-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px;
+        background: rgba(30, 38, 49, 0.5);
+        border: 1px solid var(--grid);
+        border-radius: 8px;
+    }
+
+    .anomaly-item.high {
+        border-color: rgba(255, 107, 107, 0.3);
+        background: rgba(255, 107, 107, 0.05);
+    }
+
+    .anomaly-item.medium {
+        border-color: rgba(255, 200, 87, 0.3);
+        background: rgba(255, 200, 87, 0.05);
+    }
+
+    .anomaly-icon {
+        font-size: 24px;
+    }
+
+    .anomaly-details {
+        flex: 1;
+    }
+
+    .anomaly-message {
+        color: var(--text);
+        font-weight: 500;
+        margin-bottom: 4px;
+    }
+
+    .anomaly-meta {
+        display: flex;
+        gap: 16px;
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .anomaly-action {
+        padding: 6px 12px;
+        background: transparent;
+        border: 1px solid var(--grid);
+        border-radius: 6px;
+        color: var(--text);
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .anomaly-action:hover {
+        background: var(--grid);
+        border-color: var(--accent);
+    }
+
+    .connector-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+
+    .connector-card {
+        background: rgba(30, 38, 49, 0.5);
+        border: 1px solid var(--grid);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        transition: all 0.3s;
+    }
+
+    .connector-card.active {
+        border-color: rgba(61, 168, 255, 0.3);
+    }
+
+    .connector-card.inactive {
+        opacity: 0.6;
+    }
+
+    .connector-icon {
+        font-size: 32px;
+        margin-bottom: 12px;
+    }
+
+    .connector-name {
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 4px;
+    }
+
+    .connector-status {
+        font-size: 12px;
+        color: var(--success);
+        margin-bottom: 12px;
+    }
+
+    .connector-card.inactive .connector-status {
+        color: var(--muted);
+    }
+
+    .connector-stats {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    @@media (max-width: 1024px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .telemetry-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .connector-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .stats-grid,
+        .twin-grid,
+        .telemetry-grid,
+        .connector-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+@code {
+    private System.Timers.Timer? _timer;
+    private Random _random = new Random();
+
+    private int _activeSites = 3;
+    private int _machinesOnline = 10;
+    private int _machinePercentage = 83;
+    private int _productCount = 156;
+    private int _anomalyCount = 3;
+
+    private List<MachineData> _machines = new();
+    private List<AnomalyData> _anomalies = new();
+
+    protected override void OnInitialized()
+    {
+        GenerateInitialData();
+        
+        _timer = new System.Timers.Timer(2000);
+        _timer.Elapsed += UpdateData;
+        _timer.AutoReset = true;
+        _timer.Start();
+    }
+
+    private void GenerateInitialData()
+    {
+        // Generate machine data
+        var machineIds = new[] { "CNC-001", "CNC-002", "PRESS-001", "MILL-001", "LATHE-001", "DRILL-001" };
+        var statuses = new[] { "Running", "Running", "Running", "Idle", "Running", "Maintenance" };
+        
+        for (int i = 0; i < 6; i++)
+        {
+            _machines.Add(new MachineData
+            {
+                Id = machineIds[i],
+                Status = statuses[i],
+                Temperature = _random.Next(60, 85),
+                RPM = _random.Next(800, 2200),
+                Efficiency = _random.Next(70, 98)
+            });
+        }
+
+        // Generate anomaly data
+        _anomalies = new List<AnomalyData>
+        {
+            new AnomalyData
+            {
+                Severity = "High",
+                Message = "Temperature spike detected on CNC-002",
+                Source = "OPC UA Monitor",
+                Time = "2 min ago"
+            },
+            new AnomalyData
+            {
+                Severity = "Medium",
+                Message = "Inventory mismatch for SKU-789",
+                Source = "NetSuite Sync",
+                Time = "15 min ago"
+            },
+            new AnomalyData
+            {
+                Severity = "Low",
+                Message = "Scheduled maintenance reminder for PRESS-001",
+                Source = "Maintenance System",
+                Time = "1 hour ago"
+            }
+        };
+    }
+
+    private void UpdateData(object? sender, ElapsedEventArgs e)
+    {
+        InvokeAsync(() =>
+        {
+            // Update machine stats
+            _machinesOnline = _random.Next(8, 12);
+            _machinePercentage = (_machinesOnline * 100) / 12;
+            _anomalyCount = _random.Next(1, 7);
+
+            // Update machine telemetry
+            foreach (var machine in _machines)
+            {
+                // Simulate small changes in values
+                machine.Temperature = Math.Max(60, Math.Min(95, machine.Temperature + _random.Next(-2, 3)));
+                machine.RPM = Math.Max(600, Math.Min(2400, machine.RPM + _random.Next(-50, 51)));
+                machine.Efficiency = Math.Max(60, Math.Min(100, machine.Efficiency + _random.Next(-3, 4)));
+                
+                // Occasionally change status
+                if (_random.NextDouble() < 0.1)
+                {
+                    var statuses = new[] { "Running", "Idle", "Maintenance" };
+                    machine.Status = statuses[_random.Next(statuses.Length)];
+                }
+            }
+
+            // Occasionally add new anomalies
+            if (_random.NextDouble() < 0.2 && _anomalies.Count < 5)
+            {
+                var messages = new[]
+                {
+                    "Vibration levels exceeding threshold on MILL-001",
+                    "Product quality variance detected",
+                    "Network latency affecting data sync",
+                    "Power consumption spike in Zone B",
+                    "Unexpected downtime on LATHE-001"
+                };
+
+                _anomalies.Insert(0, new AnomalyData
+                {
+                    Severity = new[] { "High", "Medium", "Low" }[_random.Next(3)],
+                    Message = messages[_random.Next(messages.Length)],
+                    Source = new[] { "OPC UA Monitor", "Quality System", "Network Monitor" }[_random.Next(3)],
+                    Time = "Just now"
+                });
+
+                if (_anomalies.Count > 5)
+                {
+                    _anomalies.RemoveAt(_anomalies.Count - 1);
+                }
+            }
+
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        _timer?.Stop();
+        _timer?.Dispose();
+    }
+
+    private class MachineData
+    {
+        public string Id { get; set; } = "";
+        public string Status { get; set; } = "";
+        public int Temperature { get; set; }
+        public int RPM { get; set; }
+        public int Efficiency { get; set; }
+    }
+
+    private class AnomalyData
+    {
+        public string Severity { get; set; } = "";
+        public string Message { get; set; } = "";
+        public string Source { get; set; } = "";
+        public string Time { get; set; } = "";
+    }
+}

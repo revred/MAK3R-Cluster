@@ -1,0 +1,17 @@
+[Unit]
+Description=MAK3R Edge Runtime
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/opt/mak3r/edge
+ExecStart=/usr/bin/dotnet /opt/mak3r/edge/Mak3r.Edge.dll
+Restart=always
+RestartSec=5
+User=mak3r
+Group=mak3r
+Environment=DOTNET_gcServer=1
+Environment=DOTNET_ThreadPool_ForceMinWorkerThreads=8
+
+[Install]
+WantedBy=multi-user.target

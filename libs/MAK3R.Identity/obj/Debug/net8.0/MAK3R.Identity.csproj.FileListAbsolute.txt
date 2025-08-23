@@ -9,3 +9,4 @@ C:\code\MAK3R-Cluster\libs\MAK3R.Identity\obj\Debug\net8.0\MAK3R.Identity.dll
 C:\code\MAK3R-Cluster\libs\MAK3R.Identity\obj\Debug\net8.0\refint\MAK3R.Identity.dll
 C:\code\MAK3R-Cluster\libs\MAK3R.Identity\obj\Debug\net8.0\MAK3R.Identity.pdb
 C:\code\MAK3R-Cluster\libs\MAK3R.Identity\obj\Debug\net8.0\ref\MAK3R.Identity.dll
+C:\code\MAK3R-Cluster\libs\MAK3R.Identity\obj\Debug\net8.0\MAK3R.Identity.sourcelink.json

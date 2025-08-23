@@ -1,0 +1,19 @@
+Where the key specs live (and map to your ask)
+
+C# software stack: src/Mak3r.Edge/*.cs (worker, services, config classes).
+
+SQLite net latency/issues: Persistence/SqliteSchema.sql + NetDiagDb.cs + periodic queue sampling in StoreService.cs and phase/batch writes in UplinkService.cs.
+
+Mock up to 1,000 machines: Services/LoadGenService.cs (deterministic, jittered state transitions, bursts, feed-holds, part counts).
+
+Reliable relay to Cluster: Services/UplinkService.cs (SignalR client with batching, acks, retry, and spool on failure).
+
+Quality test hooks: metrics endpoints + SQLite telemetry ready for P95/99 latency analysis; soak/burst/flap behaviors configurable in appsettings.json (or env vars under Edge__LoadGen__*).
+
+If you want, I can also:
+
+Add SQL helpers to compute P50/P95/P99 ack latency and reconnection counts from the DB.
+
+Wire /netdiag/* endpoints to query SQLite directly.
+
+Drop in real connectors (FOCAS/OPC UA/MTConnect) beside the virtual source while keeping the same pipeline.

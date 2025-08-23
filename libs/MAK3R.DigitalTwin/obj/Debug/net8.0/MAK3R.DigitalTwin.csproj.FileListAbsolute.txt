@@ -17,3 +17,4 @@ C:\code\MAK3R-Cluster\libs\MAK3R.DigitalTwin\obj\Debug\net8.0\MAK3R.DigitalTwin.
 C:\code\MAK3R-Cluster\libs\MAK3R.DigitalTwin\obj\Debug\net8.0\refint\MAK3R.DigitalTwin.dll
 C:\code\MAK3R-Cluster\libs\MAK3R.DigitalTwin\obj\Debug\net8.0\MAK3R.DigitalTwin.pdb
 C:\code\MAK3R-Cluster\libs\MAK3R.DigitalTwin\obj\Debug\net8.0\ref\MAK3R.DigitalTwin.dll
+C:\code\MAK3R-Cluster\libs\MAK3R.DigitalTwin\obj\Debug\net8.0\MAK3R.DigitalTwin.sourcelink.json

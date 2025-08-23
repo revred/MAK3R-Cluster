@@ -179,3 +179,4 @@ C:\code\MAK3R-Cluster\services\MAK3R.Api\bin\Debug\net8.0\Microsoft.Extensions.H
 C:\code\MAK3R-Cluster\services\MAK3R.Api\bin\Debug\net8.0\MAK3R.Connectors.dll
 C:\code\MAK3R-Cluster\services\MAK3R.Api\bin\Debug\net8.0\MAK3R.Connectors.pdb
 C:\code\MAK3R-Cluster\services\MAK3R.Api\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Binder.dll
+C:\code\MAK3R-Cluster\services\MAK3R.Api\obj\Debug\net8.0\MAK3R.Api.sourcelink.json

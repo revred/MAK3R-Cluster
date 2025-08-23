@@ -92,3 +92,129 @@ SELECT EXISTS (
 2025-08-23 17:11:09.381 +01:00 [INF] Writing value of type 'EmptyPartition`1' as Json.
 2025-08-23 17:11:09.385 +01:00 [INF] Executed endpoint 'HTTP: GET /api/connectors/instances'
 2025-08-23 17:11:09.385 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/connectors/instances - 200 null application/json; charset=utf-8 5.6247ms
+2025-08-23 17:20:16.455 +01:00 [WRN] The property 'ConnectorConfiguration.Settings' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 17:20:16.489 +01:00 [WRN] The property 'Company.ExternalRefs' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 17:20:16.489 +01:00 [WRN] The property 'Company.Tags' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 17:20:16.490 +01:00 [WRN] The property 'Machine.CurrentMetrics' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 17:20:16.491 +01:00 [WRN] The property 'Machine.ExternalRefs' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 17:20:16.491 +01:00 [WRN] The property 'Machine.Tags' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 17:20:16.491 +01:00 [WRN] The property 'Product.Attributes' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 17:20:16.491 +01:00 [WRN] The property 'Product.ExternalRefs' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 17:20:16.494 +01:00 [WRN] The property 'Product.Tags' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 17:20:16.495 +01:00 [WRN] The property 'Site.ExternalRefs' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 17:20:16.495 +01:00 [WRN] The property 'Site.Tags' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 17:20:16.632 +01:00 [INF] Executed DbCommand (8ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "type" = 'table' AND "rootpage" IS NOT NULL;
+2025-08-23 17:20:16.747 +01:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT EXISTS (
+    SELECT 1
+    FROM "Companies" AS "c")
+2025-08-23 17:20:16.751 +01:00 [INF] Starting MAK3R API
+2025-08-23 17:20:16.765 +01:00 [INF] User profile is available. Using 'C:\Users\revanur\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-08-23 17:20:16.782 +01:00 [INF] Connector hosted service started
+2025-08-23 17:20:16.879 +01:00 [INF] Now listening on: http://localhost:5137
+2025-08-23 17:20:16.879 +01:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-08-23 17:20:16.879 +01:00 [INF] Hosting environment: Development
+2025-08-23 17:20:16.879 +01:00 [INF] Content root path: C:\code\MAK3R-Cluster\services\MAK3R.Api
+2025-08-23 17:20:36.693 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/health - null null
+2025-08-23 17:20:36.769 +01:00 [INF] Executing endpoint 'HTTP: GET /api/health'
+2025-08-23 17:20:36.772 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 17:20:36.776 +01:00 [INF] Writing value of type '<>f__AnonymousType2`2' as Json.
+2025-08-23 17:20:36.779 +01:00 [INF] Executed endpoint 'HTTP: GET /api/health'
+2025-08-23 17:20:36.780 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/health - 200 null application/json; charset=utf-8 87.6133ms
+2025-08-23 17:20:42.760 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/connectors/types - null null
+2025-08-23 17:20:42.763 +01:00 [INF] Executing endpoint 'HTTP: GET /api/connectors/types'
+2025-08-23 17:20:42.764 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 17:20:42.765 +01:00 [INF] Writing value of type 'List`1' as Json.
+2025-08-23 17:20:42.765 +01:00 [INF] Executed endpoint 'HTTP: GET /api/connectors/types'
+2025-08-23 17:20:42.765 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/connectors/types - 200 null application/json; charset=utf-8 4.9533ms
+2025-08-23 17:20:48.864 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/connectors/instances - null null
+2025-08-23 17:20:48.867 +01:00 [INF] Executing endpoint 'HTTP: GET /api/connectors/instances'
+2025-08-23 17:20:48.867 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 17:20:48.868 +01:00 [INF] Writing value of type 'EmptyPartition`1' as Json.
+2025-08-23 17:20:48.871 +01:00 [INF] Executed endpoint 'HTTP: GET /api/connectors/instances'
+2025-08-23 17:20:48.871 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/connectors/instances - 200 null application/json; charset=utf-8 7.5003ms
+2025-08-23 17:20:54.636 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/connectors/health - null null
+2025-08-23 17:20:54.637 +01:00 [INF] Executing endpoint 'HTTP: GET /api/connectors/health'
+2025-08-23 17:20:54.640 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 17:20:54.642 +01:00 [INF] Writing value of type 'List`1' as Json.
+2025-08-23 17:20:54.642 +01:00 [INF] Executed endpoint 'HTTP: GET /api/connectors/health'
+2025-08-23 17:20:54.642 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/connectors/health - 200 null application/json; charset=utf-8 5.8755ms
+2025-08-23 17:43:37.127 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/health - null null
+2025-08-23 17:43:37.128 +01:00 [INF] Executing endpoint 'HTTP: GET /api/health'
+2025-08-23 17:43:37.128 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 17:43:37.128 +01:00 [INF] Writing value of type '<>f__AnonymousType2`2' as Json.
+2025-08-23 17:43:37.128 +01:00 [INF] Executed endpoint 'HTTP: GET /api/health'
+2025-08-23 17:43:37.128 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/health - 200 null application/json; charset=utf-8 0.7709ms
+2025-08-23 17:44:10.066 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - null null
+2025-08-23 17:44:10.067 +01:00 [INF] CORS policy execution successful.
+2025-08-23 17:44:10.069 +01:00 [INF] Executing endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 17:44:10.070 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 17:44:10.070 +01:00 [INF] Writing value of type 'OnboardingWizardDto' as Json.
+2025-08-23 17:44:10.076 +01:00 [INF] Executed endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 17:44:10.076 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - 200 null application/json; charset=utf-8 10.0078ms
+2025-08-23 17:44:21.339 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/connectors/types - null null
+2025-08-23 17:44:21.339 +01:00 [INF] CORS policy execution successful.
+2025-08-23 17:44:21.339 +01:00 [INF] Executing endpoint 'HTTP: GET /api/connectors/types'
+2025-08-23 17:44:21.339 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 17:44:21.339 +01:00 [INF] Writing value of type 'List`1' as Json.
+2025-08-23 17:44:21.339 +01:00 [INF] Executed endpoint 'HTTP: GET /api/connectors/types'
+2025-08-23 17:44:21.340 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/connectors/types - 200 null application/json; charset=utf-8 0.8957ms
+2025-08-23 17:44:21.382 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/connectors/instances - null null
+2025-08-23 17:44:21.382 +01:00 [INF] CORS policy execution successful.
+2025-08-23 17:44:21.382 +01:00 [INF] Executing endpoint 'HTTP: GET /api/connectors/instances'
+2025-08-23 17:44:21.382 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 17:44:21.382 +01:00 [INF] Writing value of type 'EmptyPartition`1' as Json.
+2025-08-23 17:44:21.383 +01:00 [INF] Executed endpoint 'HTTP: GET /api/connectors/instances'
+2025-08-23 17:44:21.383 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/connectors/instances - 200 null application/json; charset=utf-8 0.7328ms
+2025-08-23 17:44:33.632 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - null null
+2025-08-23 17:44:33.632 +01:00 [INF] CORS policy execution successful.
+2025-08-23 17:44:33.632 +01:00 [INF] Executing endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 17:44:33.632 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 17:44:33.632 +01:00 [INF] Writing value of type 'OnboardingWizardDto' as Json.
+2025-08-23 17:44:33.633 +01:00 [INF] Executed endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 17:44:33.633 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - 200 null application/json; charset=utf-8 0.6461ms
+2025-08-23 17:45:03.663 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - null null
+2025-08-23 17:45:03.663 +01:00 [INF] CORS policy execution successful.
+2025-08-23 17:45:03.663 +01:00 [INF] Executing endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 17:45:03.663 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 17:45:03.663 +01:00 [INF] Writing value of type 'OnboardingWizardDto' as Json.
+2025-08-23 17:45:03.663 +01:00 [INF] Executed endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 17:45:03.663 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - 200 null application/json; charset=utf-8 0.7595ms
+2025-08-23 17:45:12.859 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/connectors/types - null null
+2025-08-23 17:45:12.859 +01:00 [INF] CORS policy execution successful.
+2025-08-23 17:45:12.860 +01:00 [INF] Executing endpoint 'HTTP: GET /api/connectors/types'
+2025-08-23 17:45:12.860 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 17:45:12.860 +01:00 [INF] Writing value of type 'List`1' as Json.
+2025-08-23 17:45:12.860 +01:00 [INF] Executed endpoint 'HTTP: GET /api/connectors/types'
+2025-08-23 17:45:12.860 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/connectors/types - 200 null application/json; charset=utf-8 0.6501ms
+2025-08-23 17:45:12.902 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/connectors/instances - null null
+2025-08-23 17:45:12.902 +01:00 [INF] CORS policy execution successful.
+2025-08-23 17:45:12.902 +01:00 [INF] Executing endpoint 'HTTP: GET /api/connectors/instances'
+2025-08-23 17:45:12.902 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 17:45:12.902 +01:00 [INF] Writing value of type 'EmptyPartition`1' as Json.
+2025-08-23 17:45:12.903 +01:00 [INF] Executed endpoint 'HTTP: GET /api/connectors/instances'
+2025-08-23 17:45:12.903 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/connectors/instances - 200 null application/json; charset=utf-8 0.5067ms
+2025-08-23 17:46:50.205 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - null null
+2025-08-23 17:46:50.205 +01:00 [INF] Executing endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 17:46:50.205 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 17:46:50.205 +01:00 [INF] Writing value of type 'OnboardingWizardDto' as Json.
+2025-08-23 17:46:50.206 +01:00 [INF] Executed endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 17:46:50.206 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - 200 null application/json; charset=utf-8 1.1327ms
+2025-08-23 17:46:50.294 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/favicon.ico - null null
+2025-08-23 17:46:50.295 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/favicon.ico - 404 0 null 1.3721ms
+2025-08-23 17:46:50.297 +01:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET http://localhost:5137/favicon.ico, Response status code: 404
+2025-08-23 17:46:58.537 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - null null
+2025-08-23 17:46:58.538 +01:00 [INF] CORS policy execution successful.
+2025-08-23 17:46:58.538 +01:00 [INF] Executing endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 17:46:58.538 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 17:46:58.538 +01:00 [INF] Writing value of type 'OnboardingWizardDto' as Json.
+2025-08-23 17:46:58.538 +01:00 [INF] Executed endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 17:46:58.538 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - 200 null application/json; charset=utf-8 0.6016ms
+2025-08-23 19:07:17.187 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - null null
+2025-08-23 19:07:17.187 +01:00 [INF] CORS policy execution successful.
+2025-08-23 19:07:17.188 +01:00 [INF] Executing endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:07:17.188 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 19:07:17.188 +01:00 [INF] Writing value of type 'OnboardingWizardDto' as Json.
+2025-08-23 19:07:17.189 +01:00 [INF] Executed endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:07:17.189 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - 200 null application/json; charset=utf-8 1.6185ms

@@ -37,3 +37,4 @@ C:\code\MAK3R-Cluster\libs\MAK3R.UI\obj\Debug\net8.0\scopedcss\Components\Onboar
 C:\code\MAK3R-Cluster\libs\MAK3R.UI\obj\Debug\net8.0\scopedcss\Components\Onboarding\ReviewStep.razor.rz.scp.css
 C:\code\MAK3R-Cluster\libs\MAK3R.UI\obj\Debug\net8.0\scopedcss\Components\Shared\ProgressiveList.razor.rz.scp.css
 C:\code\MAK3R-Cluster\libs\MAK3R.UI\obj\Debug\net8.0\scopedcss\Components\Shared\SkeletonCard.razor.rz.scp.css
+C:\code\MAK3R-Cluster\libs\MAK3R.UI\obj\Debug\net8.0\MAK3R.UI.sourcelink.json

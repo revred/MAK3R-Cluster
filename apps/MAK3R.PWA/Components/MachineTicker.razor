@@ -1,0 +1,67 @@
+@using System.Timers
+@implements IDisposable
+
+<div class="ticker">
+    @if (_rows is null)
+    {
+        <div class="skeleton">Connecting to shop floor…</div>
+    }
+    else
+    {
+        <ul class="ticker-list">
+            @foreach (var r in _rows)
+            {
+                <li class="ticker-item">
+                    <span class="machine-name">@r.Machine</span>
+                    <span class="machine-state status-@r.State.ToLower()">@r.State</span>
+                    <span class="machine-metric">@r.RPM rpm</span>
+                    <span class="machine-metric">@r.Temp°C</span>
+                </li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    private List<MachineRow>? _rows;
+    private System.Timers.Timer? _timer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _timer = new System.Timers.Timer(2000);
+        _timer.Elapsed += async (sender, e) => await UpdateMachineData();
+        _timer.AutoReset = true;
+        _timer.Start();
+        
+        await UpdateMachineData();
+    }
+
+    private async Task UpdateMachineData()
+    {
+        await InvokeAsync(() =>
+        {
+            var random = new Random();
+            _rows = new List<MachineRow>
+            {
+                new("CNC-001", GetRandomState(random), random.Next(1800, 2200), random.Next(65, 85)),
+                new("Press-002", GetRandomState(random), random.Next(400, 600), random.Next(70, 90)),
+                new("Mill-003", GetRandomState(random), random.Next(800, 1200), random.Next(60, 80))
+            };
+            StateHasChanged();
+        });
+    }
+
+    private string GetRandomState(Random random)
+    {
+        var states = new[] { "Running", "Idle", "Maintenance" };
+        return states[random.Next(states.Length)];
+    }
+
+    public void Dispose()
+    {
+        _timer?.Stop();
+        _timer?.Dispose();
+    }
+
+    public record MachineRow(string Machine, string State, int RPM, int Temp);
+}

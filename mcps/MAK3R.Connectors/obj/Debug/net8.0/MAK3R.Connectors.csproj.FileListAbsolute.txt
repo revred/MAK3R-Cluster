@@ -36,3 +36,4 @@ C:\code\MAK3R-Cluster\mcps\MAK3R.Connectors\obj\Debug\net8.0\MAK3R.Connectors.dl
 C:\code\MAK3R-Cluster\mcps\MAK3R.Connectors\obj\Debug\net8.0\refint\MAK3R.Connectors.dll
 C:\code\MAK3R-Cluster\mcps\MAK3R.Connectors\obj\Debug\net8.0\MAK3R.Connectors.pdb
 C:\code\MAK3R-Cluster\mcps\MAK3R.Connectors\obj\Debug\net8.0\ref\MAK3R.Connectors.dll
+C:\code\MAK3R-Cluster\mcps\MAK3R.Connectors\obj\Debug\net8.0\MAK3R.Connectors.sourcelink.json

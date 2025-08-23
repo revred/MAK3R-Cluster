@@ -21,3 +21,4 @@ C:\code\MAK3R-Cluster\libs\MAK3R.Data\obj\Debug\net8.0\refint\MAK3R.Data.dll
 C:\code\MAK3R-Cluster\libs\MAK3R.Data\obj\Debug\net8.0\MAK3R.Data.pdb
 C:\code\MAK3R-Cluster\libs\MAK3R.Data\obj\Debug\net8.0\MAK3R.Data.genruntimeconfig.cache
 C:\code\MAK3R-Cluster\libs\MAK3R.Data\obj\Debug\net8.0\ref\MAK3R.Data.dll
+C:\code\MAK3R-Cluster\libs\MAK3R.Data\obj\Debug\net8.0\MAK3R.Data.sourcelink.json

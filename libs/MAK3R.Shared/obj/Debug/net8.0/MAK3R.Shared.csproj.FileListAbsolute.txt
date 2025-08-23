@@ -9,3 +9,4 @@ C:\code\MAK3R-Cluster\libs\MAK3R.Shared\obj\Debug\net8.0\MAK3R.Shared.dll
 C:\code\MAK3R-Cluster\libs\MAK3R.Shared\obj\Debug\net8.0\refint\MAK3R.Shared.dll
 C:\code\MAK3R-Cluster\libs\MAK3R.Shared\obj\Debug\net8.0\MAK3R.Shared.pdb
 C:\code\MAK3R-Cluster\libs\MAK3R.Shared\obj\Debug\net8.0\ref\MAK3R.Shared.dll
+C:\code\MAK3R-Cluster\libs\MAK3R.Shared\obj\Debug\net8.0\MAK3R.Shared.sourcelink.json

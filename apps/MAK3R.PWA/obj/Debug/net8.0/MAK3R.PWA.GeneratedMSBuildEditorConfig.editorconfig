@@ -28,6 +28,26 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/code/MAK3R-Cluster/apps/MAK3R.PWA/Components/AnomalyPreview.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBbm9tYWx5UHJldmlldy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/code/MAK3R-Cluster/apps/MAK3R.PWA/Components/Landing.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYW5kaW5nLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/code/MAK3R-Cluster/apps/MAK3R.PWA/Components/MachineTicker.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xNYWNoaW5lVGlja2VyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/code/MAK3R-Cluster/apps/MAK3R.PWA/Components/StatTile.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xTdGF0VGlsZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/code/MAK3R-Cluster/apps/MAK3R.PWA/Layout/EmptyLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XEVtcHR5TGF5b3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/code/MAK3R-Cluster/apps/MAK3R.PWA/Layout/LoginDisplay.razor]
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XExvZ2luRGlzcGxheS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
@@ -46,6 +66,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/code/MAK3R-Cluster/apps/MAK3R.PWA/Pages/Counter.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/code/MAK3R-Cluster/apps/MAK3R.PWA/Pages/Demo.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGVtby5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/code/MAK3R-Cluster/apps/MAK3R.PWA/Pages/Marketing.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWFya2V0aW5nLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/code/MAK3R-Cluster/apps/MAK3R.PWA/Pages/Weather.razor]

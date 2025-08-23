@@ -1,0 +1,80 @@
+@using System.Timers
+@implements IDisposable
+
+<div class="anomaly-preview">
+    @if (_items is null)
+    {
+        <div class="skeleton">Scanning for anomalies…</div>
+    }
+    else
+    {
+        <ul class="anomaly-list">
+            @foreach (var a in _items.Take(5))
+            {
+                <li class="anomaly-item">
+                    <span class="anomaly-severity severity-@a.Severity.ToLower()">@a.Severity</span>
+                    <span class="anomaly-message">@a.Message</span>
+                    <span class="anomaly-time">@a.DetectedAt.ToString("HH:mm")</span>
+                </li>
+            }
+        </ul>
+        @if (!_items.Any())
+        {
+            <div class="no-anomalies">
+                <span class="status-dot success"></span>
+                <span>All systems nominal</span>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private List<AnomalyDto>? _items;
+    private System.Timers.Timer? _timer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _timer = new System.Timers.Timer(5000);
+        _timer.Elapsed += async (sender, e) => await RefreshAnomalies();
+        _timer.AutoReset = true;
+        _timer.Start();
+
+        await RefreshAnomalies();
+    }
+
+    private async Task RefreshAnomalies()
+    {
+        await InvokeAsync(() =>
+        {
+            var random = new Random();
+            var anomalies = new List<AnomalyDto>();
+
+            // Randomly add anomalies (70% chance of having some)
+            if (random.NextDouble() > 0.3)
+            {
+                var possibleAnomalies = new[]
+                {
+                    new AnomalyDto("High", "CNC-001 temperature spike detected", DateTime.Now.AddMinutes(-random.Next(1, 60))),
+                    new AnomalyDto("Medium", "Inventory mismatch in Product SKU-789", DateTime.Now.AddMinutes(-random.Next(1, 120))),
+                    new AnomalyDto("Low", "OPC UA connection timeout retry", DateTime.Now.AddMinutes(-random.Next(1, 30))),
+                    new AnomalyDto("High", "NetSuite sync validation error", DateTime.Now.AddMinutes(-random.Next(1, 90))),
+                    new AnomalyDto("Medium", "Machine efficiency below threshold", DateTime.Now.AddMinutes(-random.Next(1, 45)))
+                };
+
+                var count = random.Next(1, Math.Min(4, possibleAnomalies.Length));
+                anomalies.AddRange(possibleAnomalies.OrderBy(x => random.Next()).Take(count));
+            }
+
+            _items = anomalies.OrderByDescending(x => x.DetectedAt).ToList();
+            StateHasChanged();
+        });
+    }
+
+    public void Dispose()
+    {
+        _timer?.Stop();
+        _timer?.Dispose();
+    }
+
+    public record AnomalyDto(string Severity, string Message, DateTime DetectedAt);
+}
