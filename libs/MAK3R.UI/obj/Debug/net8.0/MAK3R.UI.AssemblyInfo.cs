@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MAK3R.UI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+12de4923d1d907941d844af9cba2c06a0d226878")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f2c09caf6aa13fcfc2df1962ce3923472bf9e3dc")]
 [assembly: System.Reflection.AssemblyProductAttribute("MAK3R.UI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MAK3R.UI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -27,7 +27,8 @@
       "Bash(git push:*)",
       "Bash(start http://localhost:5223)",
       "Bash(start http://localhost:5225)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(start http://localhost:5226)"
     ],
     "deny": [],
     "ask": []

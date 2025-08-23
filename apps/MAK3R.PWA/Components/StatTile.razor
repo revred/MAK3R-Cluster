@@ -1,10 +1,7 @@
 <div class="stat">
-    <div class="stat-value">@Value</div>
-    <div class="stat-title">@Title</div>
-    @if (!string.IsNullOrWhiteSpace(Hint))
-    {
-        <div class="stat-hint">@Hint</div>
-    }
+  <div class="k">@Value</div>
+  <div class="t">@Title</div>
+  @if (!string.IsNullOrWhiteSpace(Hint)) { <div class="hint">@Hint</div> }
 </div>
 
 @code {

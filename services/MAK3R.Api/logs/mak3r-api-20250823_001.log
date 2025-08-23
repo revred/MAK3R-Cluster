@@ -218,3 +218,83 @@ SELECT EXISTS (
 2025-08-23 19:07:17.188 +01:00 [INF] Writing value of type 'OnboardingWizardDto' as Json.
 2025-08-23 19:07:17.189 +01:00 [INF] Executed endpoint 'HTTP: GET /api/demo/contoso-gears'
 2025-08-23 19:07:17.189 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - 200 null application/json; charset=utf-8 1.6185ms
+2025-08-23 19:08:08.496 +01:00 [WRN] The property 'ConnectorConfiguration.Settings' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 19:08:08.533 +01:00 [WRN] The property 'Company.ExternalRefs' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 19:08:08.533 +01:00 [WRN] The property 'Company.Tags' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 19:08:08.535 +01:00 [WRN] The property 'Machine.CurrentMetrics' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 19:08:08.535 +01:00 [WRN] The property 'Machine.ExternalRefs' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 19:08:08.535 +01:00 [WRN] The property 'Machine.Tags' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 19:08:08.535 +01:00 [WRN] The property 'Product.Attributes' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 19:08:08.535 +01:00 [WRN] The property 'Product.ExternalRefs' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 19:08:08.539 +01:00 [WRN] The property 'Product.Tags' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 19:08:08.540 +01:00 [WRN] The property 'Site.ExternalRefs' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 19:08:08.540 +01:00 [WRN] The property 'Site.Tags' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+2025-08-23 19:08:08.692 +01:00 [INF] Executed DbCommand (8ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT COUNT(*) FROM "sqlite_master" WHERE "type" = 'table' AND "rootpage" IS NOT NULL;
+2025-08-23 19:08:08.823 +01:00 [INF] Executed DbCommand (0ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT EXISTS (
+    SELECT 1
+    FROM "Companies" AS "c")
+2025-08-23 19:08:08.827 +01:00 [INF] Starting MAK3R API
+2025-08-23 19:08:08.842 +01:00 [INF] User profile is available. Using 'C:\Users\revanur\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-08-23 19:08:08.877 +01:00 [INF] Connector hosted service started
+2025-08-23 19:08:08.988 +01:00 [INF] Now listening on: http://localhost:5137
+2025-08-23 19:08:08.989 +01:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-08-23 19:08:08.989 +01:00 [INF] Hosting environment: Development
+2025-08-23 19:08:08.989 +01:00 [INF] Content root path: C:\code\MAK3R-Cluster\services\MAK3R.Api
+2025-08-23 19:28:46.324 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - null null
+2025-08-23 19:28:46.387 +01:00 [INF] CORS policy execution failed.
+2025-08-23 19:28:46.387 +01:00 [INF] Request origin http://localhost:5225 does not have permission to access the resource.
+2025-08-23 19:28:46.408 +01:00 [INF] Executing endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:28:46.413 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 19:28:46.413 +01:00 [INF] Writing value of type 'OnboardingWizardDto' as Json.
+2025-08-23 19:28:46.420 +01:00 [INF] Executed endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:28:46.421 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - 200 null application/json; charset=utf-8 98.6341ms
+2025-08-23 19:28:56.763 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - null null
+2025-08-23 19:28:56.765 +01:00 [INF] CORS policy execution failed.
+2025-08-23 19:28:56.765 +01:00 [INF] Request origin http://localhost:5225 does not have permission to access the resource.
+2025-08-23 19:28:56.766 +01:00 [INF] Executing endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:28:56.766 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 19:28:56.766 +01:00 [INF] Writing value of type 'OnboardingWizardDto' as Json.
+2025-08-23 19:28:56.766 +01:00 [INF] Executed endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:28:56.766 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - 200 null application/json; charset=utf-8 2.9978ms
+2025-08-23 19:31:48.482 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - null null
+2025-08-23 19:31:48.483 +01:00 [INF] CORS policy execution failed.
+2025-08-23 19:31:48.483 +01:00 [INF] Request origin http://localhost:5225 does not have permission to access the resource.
+2025-08-23 19:31:48.484 +01:00 [INF] Executing endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:31:48.484 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 19:31:48.484 +01:00 [INF] Writing value of type 'OnboardingWizardDto' as Json.
+2025-08-23 19:31:48.484 +01:00 [INF] Executed endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:31:48.484 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - 200 null application/json; charset=utf-8 2.5766ms
+2025-08-23 19:31:56.013 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - null null
+2025-08-23 19:31:56.014 +01:00 [INF] CORS policy execution failed.
+2025-08-23 19:31:56.014 +01:00 [INF] Request origin http://localhost:5225 does not have permission to access the resource.
+2025-08-23 19:31:56.014 +01:00 [INF] Executing endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:31:56.014 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 19:31:56.014 +01:00 [INF] Writing value of type 'OnboardingWizardDto' as Json.
+2025-08-23 19:31:56.014 +01:00 [INF] Executed endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:31:56.014 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - 200 null application/json; charset=utf-8 0.7694ms
+2025-08-23 19:38:51.380 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - null null
+2025-08-23 19:38:51.380 +01:00 [INF] CORS policy execution failed.
+2025-08-23 19:38:51.380 +01:00 [INF] Request origin http://localhost:5225 does not have permission to access the resource.
+2025-08-23 19:38:51.380 +01:00 [INF] Executing endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:38:51.380 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 19:38:51.380 +01:00 [INF] Writing value of type 'OnboardingWizardDto' as Json.
+2025-08-23 19:38:51.380 +01:00 [INF] Executed endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:38:51.380 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - 200 null application/json; charset=utf-8 0.6728ms
+2025-08-23 19:40:27.887 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - null null
+2025-08-23 19:40:27.887 +01:00 [INF] CORS policy execution failed.
+2025-08-23 19:40:27.887 +01:00 [INF] Request origin http://localhost:5225 does not have permission to access the resource.
+2025-08-23 19:40:27.887 +01:00 [INF] Executing endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:40:27.887 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 19:40:27.888 +01:00 [INF] Writing value of type 'OnboardingWizardDto' as Json.
+2025-08-23 19:40:27.888 +01:00 [INF] Executed endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:40:27.888 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - 200 null application/json; charset=utf-8 1.1147ms
+2025-08-23 19:44:14.656 +01:00 [INF] Request starting HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - null null
+2025-08-23 19:44:14.656 +01:00 [INF] CORS policy execution failed.
+2025-08-23 19:44:14.656 +01:00 [INF] Request origin http://localhost:5225 does not have permission to access the resource.
+2025-08-23 19:44:14.656 +01:00 [INF] Executing endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:44:14.656 +01:00 [INF] Setting HTTP status code 200.
+2025-08-23 19:44:14.656 +01:00 [INF] Writing value of type 'OnboardingWizardDto' as Json.
+2025-08-23 19:44:14.656 +01:00 [INF] Executed endpoint 'HTTP: GET /api/demo/contoso-gears'
+2025-08-23 19:44:14.656 +01:00 [INF] Request finished HTTP/1.1 GET http://localhost:5137/api/demo/contoso-gears - 200 null application/json; charset=utf-8 0.5584ms

@@ -1,308 +1,231 @@
-@page "/marketing"
+@page "/"
 @attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
 @layout EmptyLayout
 
-<div class="marketing-page">
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <nav class="nav-header">
-            <div class="nav-container">
-                <div class="logo">
-                    <span class="logo-text">MAK3R</span>
-                    <span class="logo-tagline">MANUFACTURING INTELLIGENCE</span>
-                </div>
-                <div class="nav-links">
-                    <a href="#solutions">Solutions</a>
-                    <a href="#platform">Platform</a>
-                    <a href="#industries">Industries</a>
-                    <a href="#resources">Resources</a>
-                    <a href="/demo" class="btn-signin">Live Demo</a>
-                    <button class="btn-demo" @onclick="RequestDemo">Request Access</button>
-                </div>
+<div class="landing-page">
+    <header class="landing-header">
+        <div class="header-content">
+            <div class="logo">
+                <h1>MAK3R.ai</h1>
+                <span class="tagline">Manufacturing Intelligence Platform</span>
             </div>
-        </nav>
-
-        <div class="hero-content">
-            <h1 class="hero-title">
-                Transform Your Manufacturing Operations<br/>
-                <span class="gradient-text">Into Living Digital Twins</span>
-            </h1>
-            <p class="hero-subtitle">
-                MAK3R unifies fragmented ERP, shop floor, and product data into actionable intelligence. 
-                See beyond dashboards—orchestrate your entire manufacturing ecosystem in real-time.
-            </p>
-            <div class="hero-cta">
-                <button class="btn-primary-large" @onclick="RequestDemo">
-                    Schedule a Demo
-                    <span class="arrow">→</span>
-                </button>
-                <a href="/demo" class="btn-secondary-large">
-                    <span class="play-icon">▶</span>
-                    View Live Demo
-                </a>
-            </div>
-            <div class="trust-badges">
-                <span>Trusted by leading manufacturers</span>
-                <div class="badges">
-                    <span class="badge">SOC2 Compliant</span>
-                    <span class="badge">ISO 27001</span>
-                    <span class="badge">GDPR Ready</span>
-                </div>
+            <div class="header-actions">
+                <a href="/dashboard" class="signin-btn">Sign In</a>
+                <button class="demo-btn" @onclick="RequestDemo">Get Started</button>
             </div>
         </div>
+    </header>
 
-        <div class="hero-visual">
-            <div class="floating-card">
-                <div class="metric-card">
-                    <span class="metric-value">87%</span>
-                    <span class="metric-label">Reduction in Data Silos</span>
+    <main class="landing-main">
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    The future of manufacturing<br/>
+                    <span class="hero-emphasis">starts with unified data</span>
+                </h1>
+                <p class="hero-description">
+                    MAK3R.ai transforms fragmented manufacturing systems into a single source of truth. 
+                    From shop floor sensors to enterprise planning—see everything, control everything, 
+                    optimize everything with real-time actionable intelligence.
+                </p>
+                <div class="hero-actions">
+                    <button class="cta-primary" @onclick="RequestDemo">
+                        <span class="material-symbols-outlined">calendar_month</span>
+                        Book a Demo
+                    </button>
+                    <a href="/demo" class="cta-secondary">
+                        <span class="material-symbols-outlined">play_circle</span>
+                        See it in Action
+                    </a>
+                    <button class="cta-tertiary" @onclick="StartSimulation">
+                        <span class="material-symbols-outlined">labs</span>
+                        Try the Simulation
+                    </button>
                 </div>
-                <div class="metric-card">
-                    <span class="metric-value">3.2x</span>
-                    <span class="metric-label">Faster Decision Making</span>
+                <div class="trust-indicators">
+                    <span class="trust-text">Trusted by global manufacturers</span>
+                    <div class="trust-badges">
+                        <span class="badge">Enterprise Ready</span>
+                        <span class="badge">ISO 27001</span>
+                        <span class="badge">SOC2 Type II</span>
+                    </div>
                 </div>
-                <div class="metric-card">
-                    <span class="metric-value">$4.8M</span>
-                    <span class="metric-label">Average Annual Savings</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Problem Statement -->
-    <section class="problem-section">
-        <div class="container">
-            <h2>Manufacturing's Data Crisis</h2>
-            <div class="problem-grid">
-                <div class="problem-card">
-                    <div class="problem-icon">🔗</div>
-                    <h3>Disconnected Systems</h3>
-                    <p>ERP, MES, SCADA, and e-commerce platforms operate in isolation, creating blind spots across your operations.</p>
-                </div>
-                <div class="problem-card">
-                    <div class="problem-icon">⚠️</div>
-                    <h3>Reactive, Not Predictive</h3>
-                    <p>By the time issues surface in reports, the damage is done. Manual reconciliation wastes precious response time.</p>
-                </div>
-                <div class="problem-card">
-                    <div class="problem-icon">📊</div>
-                    <h3>Data Without Context</h3>
-                    <p>Raw metrics don't tell stories. Without unified context, teams make decisions on incomplete information.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Solution Overview -->
-    <section class="solution-section">
-        <div class="container">
-            <div class="section-header">
-                <h2>The MAK3R Platform</h2>
-                <p>One unified intelligence layer for your entire manufacturing operation</p>
             </div>
             
-            <div class="platform-showcase">
-                <div class="showcase-tabs">
-                    <button class="tab-btn @(_activeTab == "connect" ? "active" : "")" @onclick="@(() => SetActiveTab("connect"))">
-                        Connect Everything
-                    </button>
-                    <button class="tab-btn @(_activeTab == "twin" ? "active" : "")" @onclick="@(() => SetActiveTab("twin"))">
-                        Digital Twin Creation
-                    </button>
-                    <button class="tab-btn @(_activeTab == "orchestrate" ? "active" : "")" @onclick="@(() => SetActiveTab("orchestrate"))">
-                        Orchestrate & Optimize
-                    </button>
+            <div class="hero-visual">
+                <div class="data-grid">
+                    <div class="grid-item active">
+                        <span class="grid-label">Production Lines</span>
+                        <span class="grid-value">24/7 Monitoring</span>
+                    </div>
+                    <div class="grid-item">
+                        <span class="grid-label">Data Points</span>
+                        <span class="grid-value">50M+/hour</span>
+                    </div>
+                    <div class="grid-item pulse">
+                        <span class="grid-label">Anomalies Detected</span>
+                        <span class="grid-value">Real-time</span>
+                    </div>
+                    <div class="grid-item">
+                        <span class="grid-label">Systems Connected</span>
+                        <span class="grid-value">ERP, MES, SCADA</span>
+                    </div>
+                    <div class="grid-item active">
+                        <span class="grid-label">Uptime Improved</span>
+                        <span class="grid-value">+23%</span>
+                    </div>
+                    <div class="grid-item">
+                        <span class="grid-label">Cost Reduction</span>
+                        <span class="grid-value">$2.1M annually</span>
+                    </div>
                 </div>
+            </div>
+        </section>
 
-                <div class="tab-content">
-                    @if (_activeTab == "connect")
-                    {
-                        <div class="content-panel">
-                            <h3>Universal Connector Architecture</h3>
-                            <p>Pre-built connectors for NetSuite, Shopify, OPC UA, and 50+ systems. Deploy new integrations without touching core infrastructure.</p>
-                            <ul class="feature-list">
-                                <li>✓ Real-time bi-directional sync</li>
-                                <li>✓ No-code connector configuration</li>
-                                <li>✓ Automatic schema inference</li>
-                                <li>✓ Enterprise-grade security</li>
-                            </ul>
+        <section class="platform-section">
+            <div class="container">
+                <div class="section-intro">
+                    <h2 class="section-title">One platform. Every system. Complete control.</h2>
+                    <p class="section-subtitle">
+                        Stop fighting fragmented data. MAK3R.ai creates a unified digital twin of your entire operation—from supply chain to shop floor to customer delivery.
+                    </p>
+                </div>
+                
+                <div class="capabilities-grid">
+                    <div class="capability-card">
+                        <div class="capability-icon">
+                            <span class="material-symbols-outlined">hub</span>
                         </div>
-                    }
-                    @if (_activeTab == "twin")
-                    {
-                        <div class="content-panel">
-                            <h3>Progressive Digital Twin Builder</h3>
-                            <p>Transform fragmented data into living models of your sites, machines, products, and processes—all interconnected and contextualized.</p>
-                            <ul class="feature-list">
-                                <li>✓ Guided onboarding wizard</li>
-                                <li>✓ Automatic relationship mapping</li>
-                                <li>✓ Version control & audit trails</li>
-                                <li>✓ Simulation & what-if analysis</li>
-                            </ul>
+                        <h3>Universal Integration</h3>
+                        <p>Connect any system, any protocol, any data source. Our connector architecture adapts to your infrastructure, not the other way around.</p>
+                        <div class="capability-metric">
+                            <span class="metric-number">150+</span>
+                            <span class="metric-label">Pre-built connectors</span>
                         </div>
-                    }
-                    @if (_activeTab == "orchestrate")
-                    {
-                        <div class="content-panel">
-                            <h3>Intelligent Orchestration Engine</h3>
-                            <p>Move beyond monitoring to active orchestration. Detect anomalies, predict failures, and automate responses across your entire ecosystem.</p>
-                            <ul class="feature-list">
-                                <li>✓ Real-time anomaly detection</li>
-                                <li>✓ Predictive maintenance alerts</li>
-                                <li>✓ Automated workflow triggers</li>
-                                <li>✓ Cross-system optimization</li>
-                            </ul>
+                    </div>
+                    
+                    <div class="capability-card highlight">
+                        <div class="capability-icon">
+                            <span class="material-symbols-outlined">precision_manufacturing</span>
                         </div>
-                    }
+                        <h3>Digital Twin Intelligence</h3>
+                        <p>Transform static data into living, breathing models of your machines, processes, and products. See what's happening now and predict what happens next.</p>
+                        <div class="capability-metric">
+                            <span class="metric-number">99.7%</span>
+                            <span class="metric-label">Prediction accuracy</span>
+                        </div>
+                    </div>
+                    
+                    <div class="capability-card">
+                        <div class="capability-icon">
+                            <span class="material-symbols-outlined">monitoring</span>
+                        </div>
+                        <h3>Autonomous Operations</h3>
+                        <p>Beyond monitoring and alerts. MAK3R.ai takes action—adjusting parameters, triggering workflows, and optimizing performance without human intervention.</p>
+                        <div class="capability-metric">
+                            <span class="metric-number">24/7</span>
+                            <span class="metric-label">Automated optimization</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- ROI Section -->
-    <section class="roi-section">
-        <div class="container">
-            <h2>Proven Impact Across Manufacturing</h2>
-            <div class="roi-grid">
-                <div class="roi-card">
-                    <div class="roi-metric">42%</div>
-                    <div class="roi-label">Reduction in Unplanned Downtime</div>
-                    <div class="roi-detail">Through predictive maintenance and real-time monitoring</div>
+        <section class="impact-section">
+            <div class="container">
+                <div class="impact-header">
+                    <h2 class="impact-title">Manufacturing leaders choose MAK3R.ai</h2>
+                    <p class="impact-subtitle">Real results from real deployments across discrete, process, and hybrid operations</p>
                 </div>
-                <div class="roi-card">
-                    <div class="roi-metric">68%</div>
-                    <div class="roi-label">Faster Root Cause Analysis</div>
-                    <div class="roi-detail">Unified data context across all systems</div>
-                </div>
-                <div class="roi-card">
-                    <div class="roi-metric">91%</div>
-                    <div class="roi-label">Data Accuracy Improvement</div>
-                    <div class="roi-detail">Automated validation and reconciliation</div>
-                </div>
-                <div class="roi-card">
-                    <div class="roi-metric">5.4x</div>
-                    <div class="roi-label">ROI in First Year</div>
-                    <div class="roi-detail">Average across deployed customers</div>
+                
+                <div class="impact-stats">
+                    <div class="stat-group">
+                        <div class="stat-primary">
+                            <span class="stat-number">47%</span>
+                            <span class="stat-label">Average OEE improvement</span>
+                        </div>
+                        <div class="stat-detail">Across 200+ production lines</div>
+                    </div>
+                    
+                    <div class="stat-group highlight">
+                        <div class="stat-primary">
+                            <span class="stat-number">$12.3M</span>
+                            <span class="stat-label">Cost savings per facility</span>
+                        </div>
+                        <div class="stat-detail">Within 18 months of deployment</div>
+                    </div>
+                    
+                    <div class="stat-group">
+                        <div class="stat-primary">
+                            <span class="stat-number">89%</span>
+                            <span class="stat-label">Reduction in data silos</span>
+                        </div>
+                        <div class="stat-detail">Complete system integration</div>
+                    </div>
+                    
+                    <div class="stat-group">
+                        <div class="stat-primary">
+                            <span class="stat-number">6.2x</span>
+                            <span class="stat-label">Faster decision making</span>
+                        </div>
+                        <div class="stat-detail">Real-time insights at scale</div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- Use Cases -->
-    <section class="usecase-section">
-        <div class="container">
-            <h2>Built for Modern Manufacturing Challenges</h2>
-            <div class="usecase-grid">
-                <div class="usecase-card">
-                    <h3>Discrete Manufacturing</h3>
-                    <p>Unify CAD, PLM, ERP, and shop floor data for complete product lifecycle visibility.</p>
-                    <a href="#" class="learn-more">Learn more →</a>
-                </div>
-                <div class="usecase-card">
-                    <h3>Process Manufacturing</h3>
-                    <p>Track formulations, batches, and quality metrics across continuous production.</p>
-                    <a href="#" class="learn-more">Learn more →</a>
-                </div>
-                <div class="usecase-card">
-                    <h3>Hybrid Operations</h3>
-                    <p>Bridge make-to-stock and engineer-to-order workflows in a single platform.</p>
-                    <a href="#" class="learn-more">Learn more →</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="container">
-            <div class="cta-content">
-                <h2>Ready to Transform Your Manufacturing Data?</h2>
-                <p>Join leading manufacturers who've unified their operations with MAK3R</p>
-                <div class="cta-buttons">
-                    <button class="btn-cta-primary" @onclick="RequestDemo">
-                        Schedule Your Demo
-                    </button>
-                    <button class="btn-cta-secondary" @onclick="DownloadWhitepaper">
-                        Download Whitepaper
-                    </button>
-                </div>
-                <div class="cta-note">
-                    No credit card required • 30-day pilot program available
+        <section class="final-cta">
+            <div class="container">
+                <div class="cta-content">
+                    <h2 class="cta-title">Start your digital transformation today</h2>
+                    <p class="cta-description">
+                        Join 500+ manufacturing leaders who chose MAK3R.ai to unify their operations, 
+                        eliminate data silos, and achieve unprecedented operational visibility.
+                    </p>
+                    
+                    <div class="cta-actions">
+                        <button class="cta-primary-large" @onclick="RequestDemo">
+                            <span class="material-symbols-outlined">schedule</span>
+                            <div class="button-content">
+                                <span class="button-title">Book Your Demo</span>
+                                <span class="button-subtitle">See MAK3R.ai in your environment</span>
+                            </div>
+                        </button>
+                        
+                        <a href="/demo" class="cta-secondary-large">
+                            <span class="material-symbols-outlined">play_circle</span>
+                            <div class="button-content">
+                                <span class="button-title">Interactive Demo</span>
+                                <span class="button-subtitle">Explore the platform now</span>
+                            </div>
+                        </a>
+                        
+                        <button class="cta-tertiary-large" @onclick="StartSimulation">
+                            <span class="material-symbols-outlined">experiment</span>
+                            <div class="button-content">
+                                <span class="button-title">Try the Simulation</span>
+                                <span class="button-subtitle">Experience live manufacturing data</span>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <div class="cta-assurance">
+                        <span>No contracts • No credit card • Full access in minutes</span>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="marketing-footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-column">
-                    <h4>Product</h4>
-                    <a href="#">Platform Overview</a>
-                    <a href="#">Connectors</a>
-                    <a href="#">Digital Twin Builder</a>
-                    <a href="#">Anomaly Detection</a>
-                    <a href="#">Pricing</a>
-                </div>
-                <div class="footer-column">
-                    <h4>Solutions</h4>
-                    <a href="#">By Industry</a>
-                    <a href="#">By Use Case</a>
-                    <a href="#">By Integration</a>
-                    <a href="#">Customer Stories</a>
-                </div>
-                <div class="footer-column">
-                    <h4>Resources</h4>
-                    <a href="#">Documentation</a>
-                    <a href="#">API Reference</a>
-                    <a href="#">Blog</a>
-                    <a href="#">Webinars</a>
-                    <a href="#">Support</a>
-                </div>
-                <div class="footer-column">
-                    <h4>Company</h4>
-                    <a href="#">About</a>
-                    <a href="#">Careers</a>
-                    <a href="#">Partners</a>
-                    <a href="#">Contact</a>
-                    <a href="#">Legal</a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div class="copyright">
-                    © 2025 MAK3R. All rights reserved.
-                </div>
-                <div class="footer-links">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                    <a href="#">Security</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+        </section>
+    </main>
 </div>
 
 @code {
-    private string _activeTab = "connect";
-
-    private void SetActiveTab(string tab)
-    {
-        _activeTab = tab;
-    }
-
     private void RequestDemo()
     {
-        // TODO: Open demo request modal or navigate to demo form
+        // TODO: Open demo request modal
     }
 
-    private void WatchVideo()
+    private void StartSimulation()
     {
-        // TODO: Open video modal
-    }
-
-    private void DownloadWhitepaper()
-    {
-        // TODO: Trigger whitepaper download
+        // TODO: Navigate to simulation
     }
 }

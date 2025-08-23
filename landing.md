@@ -93,38 +93,70 @@ app.Run();
 ## 6) Implementation Steps
 
 ### 6.1 Create Landing Page
-`Components/Landing.razor`
+`Pages/Marketing.razor`
 ```razor
 @page "/"
-@layout MainLayout
+@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+@layout EmptyLayout
 
 <section class="hero">
   <div class="hero__content">
-    <h1>MAK3R • Manufacturing Command</h1>
-    <p class="sub">Unify ERP, shop-floor, and product data into a living Digital Twin.</p>
+    <h1>Transform your manufacturing operations with unified digital intelligence</h1>
+    <p class="sub">MAK3R connects your ERP, MES, SCADA, and IoT systems into a single source of truth. Gain real-time visibility, predict failures before they happen, and optimize operations automatically.</p>
     <div class="cta">
-      <a class="btn btn-primary" href="/app/onboard">Start Onboarding</a>
-      <a class="btn btn-ghost" href="/app/machines">Live Machines</a>
+      <a class="btn btn-primary" href="/dashboard">Book a Demo</a>
+      <a class="btn btn-ghost" href="/demo">See Live Demo</a>
     </div>
     <ul class="hero__badges">
-      <li>OPC UA Ready</li><li>Shopify/NetSuite</li><li>PWA Offline</li>
+      <li>Enterprise Ready</li><li>ISO 27001</li><li>SOC2 Type II</li>
     </ul>
   </div>
   <div class="hero__viz">
-    <MachineTicker @rendermode="RenderMode.InteractiveServer" />
+    <div class="stats-grid">
+      <StatTile Title="Uptime" Value="99.7%" Hint="Achieved" />
+      <StatTile Title="Savings" Value="$4.2M" Hint="Annual Avg" />
+      <StatTile Title="Connectors" Value="150+" Hint="Ready" />
+      <StatTile Title="Processing" Value="Real-time" Hint="Data" />
+    </div>
   </div>
 </section>
 
 <section class="grid">
-  <StatTile Title="Sites" Value="12" Hint="Demo" />
-  <StatTile Title="Machines" Value="48" Hint="Streaming" />
-  <StatTile Title="Anomalies" Value="3" Hint="Open" />
-  <StatTile Title="Orders" Value="126" Hint="This week" />
+  <div class="feature-card">
+    <h3>Universal Integration</h3>
+    <p>Connect any system, any protocol. From legacy SCADA to modern cloud APIs.</p>
+    <div class="feature-metric">150+ connectors ready</div>
+  </div>
+  <div class="feature-card featured">
+    <h3>Digital Twin Intelligence</h3>
+    <p>Living models of your machines, processes, and products that learn and predict.</p>
+    <div class="feature-metric">99.7% prediction accuracy</div>
+  </div>
+  <div class="feature-card">
+    <h3>Autonomous Operations</h3>
+    <p>Beyond monitoring. MAK3R takes action to optimize performance automatically.</p>
+    <div class="feature-metric">24/7 optimization</div>
+  </div>
 </section>
 
 <section class="panel">
-  <h2>Variance & Anomaly Workbench</h2>
-  <AnomalyPreview @rendermode="RenderMode.InteractiveServer" />
+  <h2>Proven results across manufacturing</h2>
+  <div class="results-grid">
+    <StatTile Title="OEE Improvement" Value="47%" Hint="Avg across 200+ lines" />
+    <StatTile Title="Cost Savings" Value="$12M" Hint="Per facility annually" />
+    <StatTile Title="Data Silos" Value="89%" Hint="Eliminated" />
+    <StatTile Title="Decisions" Value="6.2x" Hint="Faster" />
+  </div>
+</section>
+
+<section class="final-cta">
+  <h2>Ready to transform your manufacturing operations?</h2>
+  <p class="sub">Join 500+ manufacturing leaders who chose MAK3R to eliminate data silos and achieve operational excellence.</p>
+  <div class="cta">
+    <a class="btn btn-primary" href="/dashboard">Book Your Demo</a>
+    <a class="btn btn-ghost" href="/demo">Try Interactive Demo</a>
+  </div>
+  <p class="assurance">No contracts • No credit card • Full access in minutes</p>
 </section>
 ```
 
