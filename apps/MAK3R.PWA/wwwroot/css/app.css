@@ -81,6 +81,8 @@ body {
     background-color: var(--mak3r-bg);
     color: var(--mak3r-text);
     overflow-x: hidden;
+    overflow-y: auto;
+    height: auto;
 }
 
 /* Material Icons font settings */
@@ -101,8 +103,10 @@ h1:focus,
 
 /* App container */
 #app {
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: auto;
 }
 
 /* Loading and error states */

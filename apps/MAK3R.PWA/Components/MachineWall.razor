@@ -1,0 +1,322 @@
+@page "/machine-wall"
+@using Microsoft.AspNetCore.SignalR.Client
+@using MAK3R.Core.Hubs
+@using MAK3R.Core.Models
+@using System.Text.Json
+@implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Machine Wall - MAK3R</PageTitle>
+
+<div class="machine-wall">
+    <div class="wall-header">
+        <div class="header-content">
+            <h1>
+                <span class="material-symbols-outlined">precision_manufacturing</span>
+                Machine Wall
+            </h1>
+            <div class="status-summary">
+                <div class="summary-stat success">
+                    <span class="count">@runningCount</span>
+                    <span class="label">Running</span>
+                </div>
+                <div class="summary-stat warning">
+                    <span class="count">@idleCount</span>
+                    <span class="label">Idle</span>
+                </div>
+                <div class="summary-stat danger">
+                    <span class="count">@maintenanceCount</span>
+                    <span class="label">Maintenance</span>
+                </div>
+            </div>
+            <div class="connection-status @(IsConnected ? "connected" : "disconnected")">
+                <span class="material-symbols-outlined">
+                    @(IsConnected ? "wifi" : "wifi_off")
+                </span>
+                @(IsConnected ? "Live Data" : "Disconnected")
+            </div>
+        </div>
+    </div>
+
+    <div class="machine-grid">
+        @foreach (var machine in machines)
+        {
+            <div class="machine-card @GetStatusClass(machine.Status)" 
+                 data-machine-id="@machine.Id">
+                <div class="card-header">
+                    <div class="machine-info">
+                        <h3>@machine.Name</h3>
+                        <span class="machine-type">@machine.Type</span>
+                    </div>
+                    <div class="status-indicator @GetStatusClass(machine.Status)">
+                        <span class="status-dot"></span>
+                        <span class="status-text">@machine.Status</span>
+                    </div>
+                </div>
+
+                <div class="metrics-grid">
+                    @if (machine.Metrics.Any())
+                    {
+                        @foreach (var metric in machine.Metrics.Take(4))
+                        {
+                            <div class="metric-tile">
+                                <div class="metric-value">@FormatMetricValue(metric.Value)</div>
+                                <div class="metric-label">@FormatMetricLabel(metric.Key)</div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="no-metrics">
+                            <span class="material-symbols-outlined">sensors_off</span>
+                            <span>No telemetry</span>
+                        </div>
+                    }
+                </div>
+
+                <div class="card-footer">
+                    <div class="last-update">
+                        Updated @GetTimeAgo(machine.LastUpdate)
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn" @onclick="() => ViewMachine(machine.Id)">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                        <button class="action-btn" @onclick="() => ShowHistory(machine.Id)">
+                            <span class="material-symbols-outlined">history</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @if (anomalies.Any())
+    {
+        <div class="anomaly-alerts">
+            <h2>
+                <span class="material-symbols-outlined">warning</span>
+                Recent Anomalies
+            </h2>
+            <div class="alert-list">
+                @foreach (var anomaly in anomalies.Take(5))
+                {
+                    <div class="alert-item @GetSeverityClass(anomaly.Severity)">
+                        <div class="alert-icon">
+                            <span class="material-symbols-outlined">@GetAnomalyIcon(anomaly.Type)</span>
+                        </div>
+                        <div class="alert-content">
+                            <div class="alert-title">@anomaly.Type Alert - @anomaly.MachineName</div>
+                            <div class="alert-description">@anomaly.Description</div>
+                            <div class="alert-time">@GetTimeAgo(anomaly.Timestamp)</div>
+                        </div>
+                        <div class="alert-severity">@anomaly.Severity</div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private HubConnection? hubConnection;
+    private List<MachineData> machines = new();
+    private List<AnomalyAlert> anomalies = new();
+    private int runningCount = 0;
+    private int idleCount = 0;
+    private int maintenanceCount = 0;
+
+    public bool IsConnected =>
+        hubConnection?.State == HubConnectionState.Connected;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialize with sample data
+        InitializeMachines();
+        
+        try
+        {
+            // Setup SignalR connection
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl("http://localhost:5137/hubs/machinedata")
+                .Build();
+
+            // Register event handlers
+            hubConnection.On<MachineStatusUpdate>("MachineStatusUpdated", OnMachineStatusUpdated);
+            hubConnection.On<MachineMetricsUpdate>("MachineMetricsUpdated", OnMachineMetricsUpdated);
+            hubConnection.On<AnomalyAlert>("AnomalyDetected", OnAnomalyDetected);
+
+            await hubConnection.StartAsync();
+            await hubConnection.SendAsync("JoinDashboard");
+        }
+        catch (Exception ex)
+        {
+            // Handle connection failure gracefully - continue with sample data
+            await JSRuntime.InvokeVoidAsync("console.warn", $"SignalR connection failed: {ex.Message}. Using sample data only.");
+        }
+
+        UpdateStatusCounts();
+    }
+
+    private void InitializeMachines()
+    {
+        var random = new Random();
+        machines = new List<MachineData>
+        {
+            new("cnc-001", "CNC-001", "CNC", MachineStatus.Running),
+            new("press-002", "Press-002", "Press", MachineStatus.Idle),
+            new("mill-003", "Mill-003", "Mill", MachineStatus.Maintenance),
+            new("lathe-004", "Lathe-004", "Lathe", MachineStatus.Running),
+            new("grinder-005", "Grinder-005", "Grinder", MachineStatus.Running)
+        };
+
+        // Add sample metrics
+        foreach (var machine in machines)
+        {
+            if (machine.Status == MachineStatus.Running)
+            {
+                machine.Metrics = new Dictionary<string, double>
+                {
+                    ["rpm"] = random.Next(1800, 2200),
+                    ["temperature"] = random.Next(72, 85),
+                    ["pressure"] = Math.Round(random.NextDouble() * 50 + 100, 1),
+                    ["efficiency"] = Math.Round(random.NextDouble() * 15 + 85, 1)
+                };
+            }
+            else if (machine.Status == MachineStatus.Idle)
+            {
+                machine.Metrics = new Dictionary<string, double>
+                {
+                    ["rpm"] = 0,
+                    ["temperature"] = random.Next(65, 75),
+                    ["pressure"] = Math.Round(random.NextDouble() * 20 + 80, 1)
+                };
+            }
+        }
+    }
+
+    private async Task OnMachineStatusUpdated(MachineStatusUpdate update)
+    {
+        var machine = machines.FirstOrDefault(m => m.Id == update.MachineId);
+        if (machine != null)
+        {
+            machine.Status = update.Status;
+            machine.LastUpdate = update.Timestamp;
+            UpdateStatusCounts();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task OnMachineMetricsUpdated(MachineMetricsUpdate update)
+    {
+        var machine = machines.FirstOrDefault(m => m.Id == update.MachineId);
+        if (machine != null)
+        {
+            machine.Metrics = update.Metrics;
+            machine.LastUpdate = update.Timestamp;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task OnAnomalyDetected(AnomalyAlert alert)
+    {
+        anomalies.Insert(0, alert);
+        if (anomalies.Count > 20)
+        {
+            anomalies = anomalies.Take(20).ToList();
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateStatusCounts()
+    {
+        runningCount = machines.Count(m => m.Status == MachineStatus.Running);
+        idleCount = machines.Count(m => m.Status == MachineStatus.Idle);
+        maintenanceCount = machines.Count(m => m.Status == MachineStatus.Maintenance);
+    }
+
+    private static string GetStatusClass(MachineStatus status) => status switch
+    {
+        MachineStatus.Running => "running",
+        MachineStatus.Idle => "idle", 
+        MachineStatus.Maintenance => "maintenance",
+        _ => "unknown"
+    };
+
+    private static string GetSeverityClass(string severity) => severity.ToLower() switch
+    {
+        "high" => "high-severity",
+        "medium" => "medium-severity", 
+        "low" => "low-severity",
+        _ => "low-severity"
+    };
+
+    private static string GetAnomalyIcon(string type) => type.ToLower() switch
+    {
+        "temperature" => "thermostat",
+        "vibration" => "vibration",
+        "performance" => "trending_down",
+        "quality" => "grade",
+        _ => "warning"
+    };
+
+    private static string FormatMetricValue(double value) => 
+        value % 1 == 0 ? value.ToString("F0") : value.ToString("F1");
+
+    private static string FormatMetricLabel(string key) => key switch
+    {
+        "rpm" => "RPM",
+        "temperature" => "Temp °C",
+        "pressure" => "Pressure",
+        "vibration" => "Vibration",
+        "efficiency" => "Efficiency %",
+        "feedRate" => "Feed Rate",
+        "cycleTime" => "Cycle Time",
+        _ => key.ToUpperInvariant()
+    };
+
+    private static string GetTimeAgo(DateTime timestamp)
+    {
+        var timeAgo = DateTime.UtcNow - timestamp;
+        return timeAgo.TotalMinutes < 1 ? "Just now" :
+               timeAgo.TotalHours < 1 ? $"{(int)timeAgo.TotalMinutes}m ago" :
+               timeAgo.TotalDays < 1 ? $"{(int)timeAgo.TotalHours}h ago" :
+               $"{(int)timeAgo.TotalDays}d ago";
+    }
+
+    private async Task ViewMachine(string machineId)
+    {
+        await JSRuntime.InvokeVoidAsync("console.log", $"Viewing machine {machineId}");
+    }
+
+    private async Task ShowHistory(string machineId)
+    {
+        await JSRuntime.InvokeVoidAsync("console.log", $"Showing history for machine {machineId}");
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+    private class MachineData
+    {
+        public string Id { get; }
+        public string Name { get; }
+        public string Type { get; }
+        public MachineStatus Status { get; set; }
+        public Dictionary<string, double> Metrics { get; set; } = new();
+        public DateTime LastUpdate { get; set; } = DateTime.UtcNow;
+
+        public MachineData(string id, string name, string type, MachineStatus status)
+        {
+            Id = id;
+            Name = name;
+            Type = type;
+            Status = status;
+        }
+    }
+}

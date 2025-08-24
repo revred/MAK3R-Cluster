@@ -17,7 +17,7 @@
     
     <!-- Styles -->
     <link rel="stylesheet" href="css/app.css" />
-    <link rel="stylesheet" href="css/marketing.css?v=2" />
+    <link rel="stylesheet" href="css/marketing.css?v=11" />
     <link href="MAK3R.PWA.styles.css" rel="stylesheet" />
     
     <!-- PWA -->
@@ -32,7 +32,219 @@
 
 <body>
     <div id="app">
-        <!-- Loading indicator removed to prevent flashing during navigation -->
+        <!-- Static Landing Page Content -->
+        <div id="static-landing" class="landing-page">
+            <!-- Animated Network Background -->
+            <div class="network-background">
+                <div id="particles-js"></div>
+            </div>
+            
+            <header class="landing-header">
+                <div class="header-content">
+                    <a href="/" class="logo-link">
+                        <div class="logo">
+                            <img src="assets/logo.png?v=2" alt="MAK3R.ai" class="logo-image" />
+                        </div>
+                    </a>
+                    <div class="header-actions">
+                        <a href="/dashboard" class="signin-btn">Sign In</a>
+                        <button class="demo-btn" onclick="requestDemo()">Get Started</button>
+                    </div>
+                </div>
+            </header>
+
+            <main class="landing-main">
+                <section class="hero">
+                    <div class="hero-content">
+                        <div class="hero-text">
+                            <h1 class="hero-title">
+                                We align your teams to work towards your goals with:
+                            </h1>
+                            <ul class="hero-focus-points">
+                                <li>Refined Tooling</li>
+                                <li>Real-Time Insights</li>
+                                <li>Rapid Variance Tracing</li>
+                            </ul>
+                            <p class="hero-description">
+                                We help you build a chatty Digital Twin, giving you insights to make critical decisions at the right time.
+                            </p>
+                            <div class="hero-actions">
+                                <button class="cta-primary" onclick="requestDemo()">
+                                    <span class="material-symbols-outlined">calendar_month</span>
+                                    Book a Demo
+                                </button>
+                                <a href="/demo" class="cta-secondary">
+                                    <span class="material-symbols-outlined">play_circle</span>
+                                    See it in Action
+                                </a>
+                                <button class="cta-tertiary" onclick="startSimulation()">
+                                    <span class="material-symbols-outlined">labs</span>
+                                    Try the Simulation
+                                </button>
+                            </div>
+                            <div class="trust-indicators">
+                                <span class="trust-text">Trusted by global manufacturers</span>
+                                <div class="trust-badges">
+                                    <span class="badge">Enterprise Ready</span>
+                                    <span class="badge">ISO 27001</span>
+                                    <span class="badge">SOC2 Type II</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="hero-visual">
+                            <div class="manufacturing-synergy-image">
+                                <img src="assets/replace.png" alt="Manufacturing Synergy Ecosystem" />
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Metrics Carousel -->
+                <section class="metrics-carousel-section">
+                    <div class="container">
+                        <div class="metrics-carousel">
+                            <div class="metric-tile">
+                                <div class="tile-icon">
+                                    <span class="material-symbols-outlined">precision_manufacturing</span>
+                                </div>
+                                <div class="tile-content">
+                                    <h4>CNC-001</h4>
+                                    <div class="tile-status">
+                                        <span class="status-dot running"></span>
+                                        <span>Running</span>
+                                    </div>
+                                    <div class="tile-metrics">
+                                        <span>2100 RPM • 75°C</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-tile">
+                                <div class="tile-icon">
+                                    <span class="material-symbols-outlined">factory</span>
+                                </div>
+                                <div class="tile-content">
+                                    <h4>Press-002</h4>
+                                    <div class="tile-status">
+                                        <span class="status-dot idle"></span>
+                                        <span>Idle</span>
+                                    </div>
+                                    <div class="tile-metrics">
+                                        <span>0 RPM • 68°C</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-tile">
+                                <div class="tile-icon">
+                                    <span class="material-symbols-outlined">settings</span>
+                                </div>
+                                <div class="tile-content">
+                                    <h4>Mill-003</h4>
+                                    <div class="tile-status">
+                                        <span class="status-dot maintenance"></span>
+                                        <span>Maintenance</span>
+                                    </div>
+                                    <div class="tile-metrics">
+                                        <span>0 RPM • 45°C</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-tile">
+                                <div class="tile-icon">
+                                    <span class="material-symbols-outlined">trending_up</span>
+                                </div>
+                                <div class="tile-content">
+                                    <h4>OEE Score</h4>
+                                    <div class="tile-status">
+                                        <span class="status-dot success"></span>
+                                        <span>Optimal</span>
+                                    </div>
+                                    <div class="tile-metrics">
+                                        <span>94.7% Today</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="metric-tile">
+                                <div class="tile-icon">
+                                    <span class="material-symbols-outlined">inventory</span>
+                                </div>
+                                <div class="tile-content">
+                                    <h4>Inventory</h4>
+                                    <div class="tile-status">
+                                        <span class="status-dot running"></span>
+                                        <span>In Stock</span>
+                                    </div>
+                                    <div class="tile-metrics">
+                                        <span>1,247 Units</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Footer -->
+            <footer class="landing-footer">
+                <div class="footer-content">
+                    <div class="footer-sections">
+                        <div class="footer-section">
+                            <div class="footer-logo">
+                                <img src="assets/logo.png?v=2" alt="MAK3R.ai" class="footer-logo-image" />
+                            </div>
+                            <p class="footer-description">
+                                Progressive manufacturing intelligence platform that transforms fragmented systems into unified digital twins.
+                            </p>
+                        </div>
+
+                        <div class="footer-section">
+                            <h4>Platform</h4>
+                            <ul>
+                                <li><a href="/machine-wall">Machine Wall</a></li>
+                                <li><a href="/anomaly-workbench">Anomaly Workbench</a></li>
+                                <li><a href="/shopfront-builder">Shopfront Builder</a></li>
+                                <li><a href="/file-ingestion">File Ingestion</a></li>
+                                <li><a href="/dashboard">Dashboard</a></li>
+                                <li><a href="/demo">Live Demo</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="footer-section">
+                            <h4>Solutions</h4>
+                            <ul>
+                                <li><a href="#digital-twins">Digital Twins</a></li>
+                                <li><a href="#real-time-insights">Real-Time Insights</a></li>
+                                <li><a href="#variance-tracing">Variance Tracing</a></li>
+                                <li><a href="#tooling-reuse">Refined Tooling</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="footer-section">
+                            <h4>Company</h4>
+                            <ul>
+                                <li><a href="#about">About Us</a></li>
+                                <li><a href="#contact">Contact</a></li>
+                                <li><a href="#careers">Careers</a></li>
+                                <li><a href="#privacy">Privacy Policy</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="footer-bottom">
+                        <div class="footer-copyright">
+                            <p>&copy; 2024 MAK3R.ai. All rights reserved.</p>
+                        </div>
+                        <div class="footer-social">
+                            <span class="social-text">Connect with us</span>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
     </div>
 
     <div id="blazor-error-ui">
@@ -40,9 +252,49 @@
         <a href="" class="reload">Reload</a>
         <a class="dismiss">🗙</a>
     </div>
-    <script src="_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js"></script>
-    <script src="_framework/blazor.webassembly.js"></script>
-    <script>navigator.serviceWorker.register('service-worker.js');</script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-circle-progress/1.2.2/circle-progress.min.js"></script>
+    <script src="js/semiCircle.js"></script>
+    <script src="js/particles-optimized.js"></script>
+    <script src="js/manufacturing-synergy.js"></script>
+    <script>
+        // Handle routing without Blazor interference
+        function requestDemo() {
+            alert('Demo request functionality - integrate with your CRM');
+        }
+        
+        function startSimulation() {
+            window.location.href = '/demo';
+        }
+        
+        // Only load Blazor scripts and start if NOT on landing page
+        if (window.location.pathname !== '/') {
+            console.log('Loading Blazor for dashboard/app routes');
+            
+            // Dynamically load Blazor scripts
+            const authScript = document.createElement('script');
+            authScript.src = '_content/Microsoft.AspNetCore.Components.WebAssembly.Authentication/AuthenticationService.js';
+            document.head.appendChild(authScript);
+            
+            const blazorScript = document.createElement('script');
+            blazorScript.src = '_framework/blazor.webassembly.js';
+            blazorScript.onload = function() {
+                // Hide static landing and start Blazor
+                const staticLanding = document.getElementById('static-landing');
+                if (staticLanding) staticLanding.style.display = 'none';
+                
+                Blazor.start().then(() => {
+                    console.log('Blazor started for dashboard');
+                });
+            };
+            document.head.appendChild(blazorScript);
+        } else {
+            // Keep static landing visible, don't load Blazor at all
+            console.log('Static landing page mode - Blazor not loaded');
+        }
+        
+        navigator.serviceWorker.register('service-worker.js');
+    </script>
 </body>
 
 </html>
