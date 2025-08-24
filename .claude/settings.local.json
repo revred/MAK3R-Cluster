@@ -51,7 +51,14 @@
       "Read(/C:\\c\\code/**)",
       "Read(/C:\\c\\code/**)",
       "Read(/C:\\c\\code/**)",
-      "Read(/C:\\c\\code/**)"
+      "Read(/C:\\c\\code/**)",
+      "Bash(sed:*)",
+      "Read(/C:\\code\\DB2XL/**)",
+      "Read(/C:\\code\\DB2XL/**)",
+      "Read(/C:\\code\\DB2XL/**)",
+      "Read(/C:\\code\\DB2XL/**)",
+      "Read(/C:\\code\\DB2XL\\DB2XL.Core\\Services/**)",
+      "Read(/C:\\code\\DB2XL\\DB2XL.Console\\Services/**)"
     ],
     "deny": [],
     "ask": [],

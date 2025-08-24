@@ -1,0 +1,25 @@
+meta {
+  name: API Health
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/health
+  body: none
+  auth: none
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response indicates healthy", function() {
+    expect(res.getBody().status).to.equal('Healthy');
+  });
+  
+  test("Response time is reasonable", function() {
+    expect(res.getResponseTime()).to.be.below(1000);
+  });
+}

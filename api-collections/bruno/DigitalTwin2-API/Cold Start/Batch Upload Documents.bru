@@ -1,0 +1,49 @@
+meta {
+  name: Batch Upload Documents
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/{{apiVersion}}/ingestion/batch
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+headers {
+  X-DataRoom-ID: {{dataRoomId}}
+  X-Correlation-ID: {{correlationId}}
+}
+
+body:multipart-form {
+  documents: @/path/to/cold-start-documents.zip
+  options: {
+    "enableParallelProcessing": true,
+    "maxParallelism": 8,
+    "minConfidenceThreshold": 0.5,
+    "storeIntermediateResults": true
+  }
+}
+
+tests {
+  test("Status is 202 (Accepted)", function() {
+    expect(res.getStatus()).to.equal(202);
+  });
+  
+  test("Response has batch ID", function() {
+    expect(res.getBody().batchId).to.be.a('string');
+  });
+  
+  test("Response has document count", function() {
+    expect(res.getBody().totalDocuments).to.be.a('number');
+    expect(res.getBody().totalDocuments).to.be.above(0);
+  });
+}
+
+vars:post-response {
+  batchId: res.body.batchId
+}

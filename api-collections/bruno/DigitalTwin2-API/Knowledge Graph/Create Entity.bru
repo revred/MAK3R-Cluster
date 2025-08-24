@@ -1,0 +1,59 @@
+meta {
+  name: Create Entity
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/{{apiVersion}}/knowledge-graph/entities
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+headers {
+  Content-Type: application/json
+  X-DataRoom-ID: {{dataRoomId}}
+  X-Correlation-ID: {{correlationId}}
+}
+
+body:json {
+  {
+    "type": "vendor",
+    "attributes": {
+      "name": {
+        "value": "ACME Manufacturing Corp",
+        "confidence": 0.95
+      },
+      "tax_id": {
+        "value": "12-3456789",
+        "confidence": 0.92
+      },
+      "address": {
+        "value": "123 Industrial Blvd, Detroit, MI 48201",
+        "confidence": 0.88
+      }
+    }
+  }
+}
+
+tests {
+  test("Status is 201", function() {
+    expect(res.getStatus()).to.equal(201);
+  });
+  
+  test("Response has entity ID", function() {
+    expect(res.getBody().id).to.be.a('string');
+  });
+  
+  test("Entity type matches", function() {
+    expect(res.getBody().type).to.equal('vendor');
+  });
+}
+
+vars:post-response {
+  entityId: res.body.id
+}

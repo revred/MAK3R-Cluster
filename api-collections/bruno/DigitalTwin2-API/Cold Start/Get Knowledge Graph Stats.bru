@@ -1,0 +1,43 @@
+meta {
+  name: Get Knowledge Graph Stats
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/{{apiVersion}}/knowledge-graph/stats
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+headers {
+  X-DataRoom-ID: {{dataRoomId}}
+  X-Correlation-ID: {{correlationId}}
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response has entity count", function() {
+    expect(res.getBody().totalEntities).to.be.a('number');
+    expect(res.getBody().totalEntities).to.be.above(0);
+  });
+  
+  test("Response has relationship count", function() {
+    expect(res.getBody().totalRelations).to.be.a('number');
+  });
+  
+  test("Cold start success criteria", function() {
+    const stats = res.getBody();
+    // Minimum entities for successful cold start
+    expect(stats.totalEntities).to.be.above(100);
+    // Evidence coverage target
+    expect(stats.evidencePercentage).to.be.above(0.90);
+  });
+}

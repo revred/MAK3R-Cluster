@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "DigitalTwin2 API",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

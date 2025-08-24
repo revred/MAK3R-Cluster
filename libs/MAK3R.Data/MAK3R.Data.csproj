@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MAK3R.Core\MAK3R.Core.csproj" />
     <ProjectReference Include="..\MAK3R.DigitalTwin\MAK3R.DigitalTwin.csproj" />
     <ProjectReference Include="..\..\mcps\MAK3R.Connectors.Abstractions\MAK3R.Connectors.Abstractions.csproj" />
   </ItemGroup>

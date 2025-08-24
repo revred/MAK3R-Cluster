@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using MAK3R.DigitalTwin.Entities;
+using MAK3R.Data.Entities;
 using MAK3R.Connectors.Abstractions;
 using System.Text.Json;
 
@@ -19,6 +20,13 @@ public class MAK3RDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Product> Products => Set<Product>();
     public DbSet<ConnectorConfiguration> ConnectorConfigurations => Set<ConnectorConfiguration>();
 
+    // DigitalTwin2 Knowledge Graph
+    public DbSet<KnowledgeEntity> KnowledgeEntities => Set<KnowledgeEntity>();
+    public DbSet<EntityAttribute> EntityAttributes => Set<EntityAttribute>();
+    public DbSet<EntityRelation> EntityRelations => Set<EntityRelation>();
+    public DbSet<Evidence> Evidence => Set<Evidence>();
+    public DbSet<EventLedger> EventLedger => Set<EventLedger>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -28,6 +36,9 @@ public class MAK3RDbContext : IdentityDbContext<IdentityUser>
         ConfigureMachine(modelBuilder);
         ConfigureProduct(modelBuilder);
         ConfigureConnectorConfiguration(modelBuilder);
+
+        // DigitalTwin2 Knowledge Graph
+        ConfigureKnowledgeGraph(modelBuilder);
     }
 
     private static void ConfigureCompany(ModelBuilder modelBuilder)
@@ -170,6 +181,96 @@ public class MAK3RDbContext : IdentityDbContext<IdentityUser>
         connectorEntity.Property(c => c.ConnectorId).HasMaxLength(100);
 
         connectorEntity.Property(c => c.Settings)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, (JsonSerializerOptions?)null) ?? new Dictionary<string, object>()
+            );
+    }
+
+    private static void ConfigureKnowledgeGraph(ModelBuilder modelBuilder)
+    {
+        // Configure KnowledgeEntity
+        var entityBuilder = modelBuilder.Entity<KnowledgeEntity>();
+        entityBuilder.HasKey(e => e.Id);
+        entityBuilder.Property(e => e.Id).HasMaxLength(50);
+        entityBuilder.Property(e => e.Type).IsRequired().HasMaxLength(100);
+        entityBuilder.Property(e => e.DataRoomId).IsRequired().HasMaxLength(50);
+        entityBuilder.HasIndex(e => new { e.Type, e.DataRoomId });
+        entityBuilder.HasIndex(e => e.DataRoomId);
+
+        // Configure EntityAttribute
+        var attributeBuilder = modelBuilder.Entity<EntityAttribute>();
+        attributeBuilder.HasKey(a => a.Id);
+        attributeBuilder.Property(a => a.Id).HasMaxLength(50);
+        attributeBuilder.Property(a => a.EntityId).IsRequired().HasMaxLength(50);
+        attributeBuilder.Property(a => a.Name).IsRequired().HasMaxLength(200);
+        attributeBuilder.Property(a => a.ValueType).HasMaxLength(50);
+        attributeBuilder.Property(a => a.EvidenceId).HasMaxLength(50);
+        attributeBuilder.HasIndex(a => new { a.EntityId, a.Name });
+        attributeBuilder.HasIndex(a => a.EvidenceId);
+        
+        // Store Value as JSON for flexibility
+        attributeBuilder.Property(a => a.Value)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<object>(v, (JsonSerializerOptions?)null)
+            );
+
+        // Configure EntityRelation
+        var relationBuilder = modelBuilder.Entity<EntityRelation>();
+        relationBuilder.HasKey(r => r.Id);
+        relationBuilder.Property(r => r.Id).HasMaxLength(50);
+        relationBuilder.Property(r => r.SourceEntityId).IsRequired().HasMaxLength(50);
+        relationBuilder.Property(r => r.TargetEntityId).IsRequired().HasMaxLength(50);
+        relationBuilder.Property(r => r.RelationshipType).IsRequired().HasMaxLength(100);
+        relationBuilder.Property(r => r.EvidenceId).HasMaxLength(50);
+        relationBuilder.HasIndex(r => new { r.SourceEntityId, r.RelationshipType });
+        relationBuilder.HasIndex(r => new { r.TargetEntityId, r.RelationshipType });
+        relationBuilder.HasIndex(r => r.EvidenceId);
+
+        relationBuilder.Property(r => r.Properties)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, (JsonSerializerOptions?)null) ?? new Dictionary<string, object>()
+            );
+
+        // Configure Evidence
+        var evidenceBuilder = modelBuilder.Entity<Evidence>();
+        evidenceBuilder.HasKey(e => e.Id);
+        evidenceBuilder.Property(e => e.Id).HasMaxLength(50);
+        evidenceBuilder.Property(e => e.SourceType).IsRequired().HasMaxLength(50);
+        evidenceBuilder.Property(e => e.SourceId).IsRequired().HasMaxLength(200);
+        evidenceBuilder.Property(e => e.SourcePath).IsRequired().HasMaxLength(1000);
+        evidenceBuilder.Property(e => e.BoundingBox).HasMaxLength(100);
+        evidenceBuilder.Property(e => e.TextSpan).HasMaxLength(5000);
+        evidenceBuilder.Property(e => e.ExtractionMethod).IsRequired().HasMaxLength(50);
+        evidenceBuilder.Property(e => e.DataRoomId).IsRequired().HasMaxLength(50);
+        evidenceBuilder.Property(e => e.CorrelationId).IsRequired().HasMaxLength(50);
+        evidenceBuilder.HasIndex(e => new { e.SourceType, e.SourceId });
+        evidenceBuilder.HasIndex(e => e.DataRoomId);
+        evidenceBuilder.HasIndex(e => e.CorrelationId);
+
+        evidenceBuilder.Property(e => e.Metadata)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, (JsonSerializerOptions?)null) ?? new Dictionary<string, object>()
+            );
+
+        // Configure EventLedger
+        var eventBuilder = modelBuilder.Entity<EventLedger>();
+        eventBuilder.HasKey(e => e.Id);
+        eventBuilder.Property(e => e.Id).HasMaxLength(50);
+        eventBuilder.Property(e => e.EventType).IsRequired().HasMaxLength(100);
+        eventBuilder.Property(e => e.SourceId).IsRequired().HasMaxLength(200);
+        eventBuilder.Property(e => e.SourceType).IsRequired().HasMaxLength(50);
+        eventBuilder.Property(e => e.DataRoomId).IsRequired().HasMaxLength(50);
+        eventBuilder.Property(e => e.CorrelationId).IsRequired().HasMaxLength(50);
+        eventBuilder.HasIndex(e => new { e.EventType, e.SourceId });
+        eventBuilder.HasIndex(e => new { e.DataRoomId, e.EventTimestamp });
+        eventBuilder.HasIndex(e => e.SequenceNumber).IsUnique();
+        eventBuilder.HasIndex(e => e.EventTimestamp);
+
+        eventBuilder.Property(e => e.EventData)
             .HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                 v => JsonSerializer.Deserialize<Dictionary<string, object>>(v, (JsonSerializerOptions?)null) ?? new Dictionary<string, object>()

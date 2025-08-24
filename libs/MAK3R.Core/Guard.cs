@@ -53,4 +53,43 @@ public static class Guard
             throw new ArgumentOutOfRangeException(paramName, value, $"Value must be greater than or equal to {minimum}");
         return value;
     }
+
+    // DigitalTwin2 specific validation methods
+    public static double ValidConfidence(double confidence, [CallerArgumentExpression(nameof(confidence))] string? paramName = null)
+    {
+        if (confidence < 0.0 || confidence > 1.0)
+            throw new ArgumentOutOfRangeException(paramName, confidence, "Confidence must be between 0.0 and 1.0");
+        return confidence;
+    }
+
+    public static string ValidEntityId(string entityId, [CallerArgumentExpression(nameof(entityId))] string? paramName = null)
+    {
+        NotNullOrWhiteSpace(entityId, paramName);
+        if (entityId.Length > 100)
+            throw new ArgumentException("Entity ID cannot exceed 100 characters", paramName);
+        return entityId;
+    }
+
+    public static string ValidDataRoomId(string dataRoomId, [CallerArgumentExpression(nameof(dataRoomId))] string? paramName = null)
+    {
+        NotNullOrWhiteSpace(dataRoomId, paramName);
+        if (!dataRoomId.StartsWith("DR-") || dataRoomId.Length < 5)
+            throw new ArgumentException("Data room ID must start with 'DR-' and be at least 5 characters", paramName);
+        return dataRoomId;
+    }
+
+    public static double PositiveValue(double value, [CallerArgumentExpression(nameof(value))] string? paramName = null)
+    {
+        if (value <= 0.0)
+            throw new ArgumentOutOfRangeException(paramName, value, "Value must be positive");
+        return value;
+    }
+
+    public static string ValidUlid(string ulid, [CallerArgumentExpression(nameof(ulid))] string? paramName = null)
+    {
+        NotNullOrWhiteSpace(ulid, paramName);
+        if (ulid.Length != 26)
+            throw new ArgumentException("ULID must be exactly 26 characters", paramName);
+        return ulid;
+    }
 }

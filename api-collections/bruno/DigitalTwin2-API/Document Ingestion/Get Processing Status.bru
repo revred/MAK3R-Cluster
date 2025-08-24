@@ -1,0 +1,37 @@
+meta {
+  name: Get Processing Status
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/{{apiVersion}}/ingestion/processing/{{processingId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+headers {
+  X-DataRoom-ID: {{dataRoomId}}
+  X-Correlation-ID: {{correlationId}}
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response has processing status", function() {
+    expect(res.getBody().processingId).to.equal("{{processingId}}");
+    expect(res.getBody().completedStage).to.be.a('string');
+  });
+  
+  test("Processing completed or in progress", function() {
+    const stage = res.getBody().completedStage;
+    const validStages = ['Started', 'Classification', 'Extraction', 'Mapping', 'Storage', 'Completed', 'Failed'];
+    expect(validStages).to.include(stage);
+  });
+}

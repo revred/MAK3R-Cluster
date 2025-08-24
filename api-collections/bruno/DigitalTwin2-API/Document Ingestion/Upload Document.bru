@@ -1,0 +1,48 @@
+meta {
+  name: Upload Document
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/{{apiVersion}}/ingestion/documents
+  body: multipartForm
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+headers {
+  X-DataRoom-ID: {{dataRoomId}}
+  X-Correlation-ID: {{correlationId}}
+}
+
+body:multipart-form {
+  file: @/path/to/sample-invoice.pdf
+  options: {
+    "minConfidenceThreshold": 0.7,
+    "storeIntermediateResults": true,
+    "enableParallelProcessing": false
+  }
+}
+
+tests {
+  test("Status is 202 (Accepted)", function() {
+    expect(res.getStatus()).to.equal(202);
+  });
+  
+  test("Response has processing ID", function() {
+    expect(res.getBody().processingId).to.be.a('string');
+  });
+  
+  test("Response has document ID", function() {
+    expect(res.getBody().documentId).to.be.a('string');
+  });
+}
+
+vars:post-response {
+  processingId: res.body.processingId
+  documentId: res.body.documentId
+}

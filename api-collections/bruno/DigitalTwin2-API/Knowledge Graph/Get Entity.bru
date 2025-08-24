@@ -1,0 +1,32 @@
+meta {
+  name: Get Entity
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/{{apiVersion}}/knowledge-graph/entities/{{entityId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+headers {
+  X-DataRoom-ID: {{dataRoomId}}
+  X-Correlation-ID: {{correlationId}}
+}
+
+tests {
+  test("Status is 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("Response has entity data", function() {
+    expect(res.getBody().id).to.be.a('string');
+    expect(res.getBody().type).to.be.a('string');
+    expect(res.getBody().attributes).to.be.an('object');
+  });
+}

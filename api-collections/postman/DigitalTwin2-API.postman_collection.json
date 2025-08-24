@@ -1,0 +1,429 @@
+{
+  "info": {
+    "name": "DigitalTwin2 API",
+    "description": "Complete API testing collection for DigitalTwin2 - Progressive, Live, Chatty & Opinionated Digital Twin system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": {
+      "major": 1,
+      "minor": 0,
+      "patch": 0
+    }
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set correlation ID for each request",
+          "pm.globals.set('correlationId', 'correlation-' + Date.now());"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5225"
+    },
+    {
+      "key": "apiVersion", 
+      "value": "v1"
+    },
+    {
+      "key": "dataRoomId",
+      "value": "test-dataroom-01"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "API Health Check",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response indicates healthy', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status).to.eql('Healthy');",
+                  "});",
+                  "",
+                  "pm.test('Response time is reasonable', function() {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Knowledge Graph",
+      "item": [
+        {
+          "name": "Create Entity",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-DataRoom-ID",
+                "value": "{{dataRoomId}}"
+              },
+              {
+                "key": "X-Correlation-ID",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"vendor\",\n  \"attributes\": {\n    \"name\": {\n      \"value\": \"ACME Manufacturing Corp\",\n      \"confidence\": 0.95\n    },\n    \"tax_id\": {\n      \"value\": \"12-3456789\",\n      \"confidence\": 0.92\n    },\n    \"address\": {\n      \"value\": \"123 Industrial Blvd, Detroit, MI 48201\",\n      \"confidence\": 0.88\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/knowledge-graph/entities",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "knowledge-graph", "entities"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 201', function() {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response has entity ID', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.be.a('string');",
+                  "    pm.globals.set('entityId', jsonData.id);",
+                  "});",
+                  "",
+                  "pm.test('Entity type matches', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.type).to.eql('vendor');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Entity",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-DataRoom-ID", 
+                "value": "{{dataRoomId}}"
+              },
+              {
+                "key": "X-Correlation-ID",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/knowledge-graph/entities/{{entityId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "knowledge-graph", "entities", "{{entityId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has entity data', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.be.a('string');",
+                  "    pm.expect(jsonData.type).to.be.a('string');",
+                  "    pm.expect(jsonData.attributes).to.be.an('object');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Document Ingestion",
+      "item": [
+        {
+          "name": "Upload Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-DataRoom-ID",
+                "value": "{{dataRoomId}}"
+              },
+              {
+                "key": "X-Correlation-ID", 
+                "value": "{{correlationId}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/path/to/sample-invoice.pdf"
+                },
+                {
+                  "key": "options",
+                  "value": "{\"minConfidenceThreshold\": 0.7, \"storeIntermediateResults\": true, \"enableParallelProcessing\": false}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/ingestion/documents",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "ingestion", "documents"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 202 (Accepted)', function() {",
+                  "    pm.response.to.have.status(202);",
+                  "});",
+                  "",
+                  "pm.test('Response has processing ID', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.processingId).to.be.a('string');",
+                  "    pm.globals.set('processingId', jsonData.processingId);",
+                  "});",
+                  "",
+                  "pm.test('Response has document ID', function() {",
+                  "    const jsonData = pm.response.json();", 
+                  "    pm.expect(jsonData.documentId).to.be.a('string');",
+                  "    pm.globals.set('documentId', jsonData.documentId);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Processing Status",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-DataRoom-ID",
+                "value": "{{dataRoomId}}"
+              },
+              {
+                "key": "X-Correlation-ID",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/ingestion/processing/{{processingId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "ingestion", "processing", "{{processingId}}"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has processing status', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.processingId).to.eql(pm.globals.get('processingId'));",
+                  "    pm.expect(jsonData.completedStage).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.test('Processing completed or in progress', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    const validStages = ['Started', 'Classification', 'Extraction', 'Mapping', 'Storage', 'Completed', 'Failed'];",
+                  "    pm.expect(validStages).to.include(jsonData.completedStage);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cold Start",
+      "item": [
+        {
+          "name": "Batch Upload Documents",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-DataRoom-ID",
+                "value": "{{dataRoomId}}"
+              },
+              {
+                "key": "X-Correlation-ID",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "documents",
+                  "type": "file",
+                  "src": "/path/to/cold-start-documents.zip"
+                },
+                {
+                  "key": "options",
+                  "value": "{\"enableParallelProcessing\": true, \"maxParallelism\": 8, \"minConfidenceThreshold\": 0.5, \"storeIntermediateResults\": true}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/ingestion/batch",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "ingestion", "batch"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test", 
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 202 (Accepted)', function() {",
+                  "    pm.response.to.have.status(202);",
+                  "});",
+                  "",
+                  "pm.test('Response has batch ID', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.batchId).to.be.a('string');",
+                  "    pm.globals.set('batchId', jsonData.batchId);",
+                  "});",
+                  "",
+                  "pm.test('Response has document count', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.totalDocuments).to.be.a('number');",
+                  "    pm.expect(jsonData.totalDocuments).to.be.above(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Knowledge Graph Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-DataRoom-ID",
+                "value": "{{dataRoomId}}"
+              },
+              {
+                "key": "X-Correlation-ID",
+                "value": "{{correlationId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/{{apiVersion}}/knowledge-graph/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "{{apiVersion}}", "knowledge-graph", "stats"]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript", 
+                "exec": [
+                  "pm.test('Status is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has entity count', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.totalEntities).to.be.a('number');",
+                  "    pm.expect(jsonData.totalEntities).to.be.above(0);",
+                  "});",
+                  "",
+                  "pm.test('Response has relationship count', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.totalRelations).to.be.a('number');",
+                  "});",
+                  "",
+                  "pm.test('Cold start success criteria', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    // Minimum entities for successful cold start", 
+                  "    pm.expect(jsonData.totalEntities).to.be.above(100);",
+                  "    // Evidence coverage target",
+                  "    pm.expect(jsonData.evidencePercentage).to.be.above(0.90);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
