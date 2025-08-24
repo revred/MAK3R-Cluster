@@ -28,7 +28,19 @@
       "Bash(start http://localhost:5223)",
       "Bash(start http://localhost:5225)",
       "Bash(git checkout:*)",
-      "Bash(start http://localhost:5226)"
+      "Bash(start http://localhost:5226)",
+      "Bash(copy:*)",
+      "WebFetch(domain:mak3r.ai)",
+      "Bash(cat:*)",
+      "Bash(chmod:*)",
+      "Bash(dotnet test:*)",
+      "Bash(del C:codeMAK3R-ClusterlibsMAK3R.CoreHubsIMachineDataHubClient.cs)",
+      "Bash(cmd /c \"del C:\\code\\MAK3R-Cluster\\libs\\MAK3R.Core\\Hubs\\IMachineDataHubClient.cs\")",
+      "Bash(del \"C:\\code\\MAK3R-Cluster\\libs\\MAK3R.Core\\Hubs\\IMachineDataHubClient.cs\" /F)",
+      "Bash(powershell:*)",
+      "Bash(start http://localhost:9080)",
+      "Bash(git commit:*)",
+      "Bash(dotnet clean:*)"
     ],
     "deny": [],
     "ask": []

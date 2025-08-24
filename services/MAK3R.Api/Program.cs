@@ -13,6 +13,8 @@ using MAK3R.Core;
 using MAK3R.Connectors;
 // Connector-specific using statements removed for MCP architecture
 using MAK3R.Api.Endpoints;
+using MAK3R.Core.Hubs;
+using MAK3R.Core.Services;
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
@@ -82,6 +84,12 @@ builder.Services.AddScoped<ITwinOrchestrator, TwinOrchestrator>();
 // Add connector hub with MCP-like architecture
 builder.Services.AddConnectorHub();
 
+// Add SignalR
+builder.Services.AddSignalR();
+
+// Add background services
+builder.Services.AddHostedService<MachineDataBroadcastService>();
+
 // Add API services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -98,6 +106,9 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowBlazorWasm");
 app.UseAuthentication();
 app.UseAuthorization();
+
+// SignalR Hub
+app.MapHub<MachineDataHub>("/hubs/machinedata");
 
 // Health check endpoint
 app.MapGet("/api/health", () => Results.Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow }))

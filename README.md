@@ -192,26 +192,33 @@ dotnet run --project apps/MAK3R.PWA
 
 ## 📈 Roadmap
 
-### Current Status (v0.1)
+### Current Status (v0.2)
 - ✅ Basic application shell and architecture
 - ✅ MCP-like connector framework
 - ✅ Digital twin data models
 - ✅ PWA foundations
 - ✅ JWT authentication
 - ✅ Connector management APIs
+- ✅ SignalR integration for real-time data
+- ✅ Machine wall UI with live telemetry
+- ✅ Anomaly detection workbench
+- ✅ File ingestion system with schema inference
+- ✅ Shopfront builder with product management
+- ✅ Comprehensive test suite (60+ unit tests)
+- ✅ GitHub Actions CI/CD pipeline
 
-### Next Phase (v0.2)
-- 🔄 SignalR integration for real-time data
-- 🔄 Machine wall UI with live telemetry
-- 🔄 Anomaly detection workbench
-- 🔄 File ingestion system
-- 🔄 Comprehensive test suite
+### Next Phase (v0.3)
+- 🔄 Playwright E2E test automation
+- 🔄 Production deployment configuration
+- 🔄 Advanced analytics dashboard
+- 🔄 Real-time anomaly alerts
+- 🔄 Enhanced PWA offline capabilities
 
 ### Future (v1.0)
-- Shopfront builder
-- Advanced analytics
 - Multi-tenant support
 - Advanced connector ecosystem
+- AI-powered insights
+- Mobile-first responsive design
 - Production hardening
 
 ## 🤝 Contributing

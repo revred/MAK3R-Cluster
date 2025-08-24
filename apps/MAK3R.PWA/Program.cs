@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MAK3R.PWA;
+using MAK3R.PWA.Services;
 using MAK3R.UI.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -11,6 +12,10 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("http://
 
 // Add progressive loading services
 builder.Services.AddProgressiveLoading();
+
+// Add product management services
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IFileIngestionService, FileIngestionService>();
 
 builder.Services.AddOidcAuthentication(options =>
 {
