@@ -3,7 +3,9 @@
 
 <PageTitle>Anomaly Workbench - MAK3R</PageTitle>
 
-<div class="anomalies-page">
+<link href="_content/MAK3R.UI/css/coming-soon.css" rel="stylesheet" />
+
+<div class="coming-soon-page">
     <div class="page-header">
         <h1>
             <span class="material-symbols-outlined">warning</span>
@@ -14,7 +16,7 @@
 
     <div class="coming-soon">
         <div class="coming-soon-content">
-            <span class="material-symbols-outlined large-icon">troubleshoot</span>
+            <span class="material-symbols-outlined large-icon warning">troubleshoot</span>
             <h2>Coming Soon</h2>
             <p>The Anomaly Workbench is currently under development. This will provide comprehensive anomaly detection and analysis capabilities.</p>
             
@@ -44,101 +46,3 @@
     </div>
 </div>
 
-<style>
-    .anomalies-page {
-        padding: 2rem;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-
-    .page-header {
-        margin-bottom: 2rem;
-    }
-
-    .page-header h1 {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 2rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-
-    .coming-soon {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 60vh;
-    }
-
-    .coming-soon-content {
-        text-align: center;
-        padding: 3rem;
-        background: var(--bs-light);
-        border-radius: 12px;
-        max-width: 600px;
-    }
-
-    .large-icon {
-        font-size: 4rem !important;
-        color: var(--bs-warning);
-        margin-bottom: 1rem;
-    }
-
-    .placeholder-features {
-        text-align: left;
-        margin: 2rem 0;
-        padding: 1.5rem;
-        background: white;
-        border-radius: 8px;
-    }
-
-    .placeholder-features ul {
-        margin-bottom: 0;
-    }
-
-    .placeholder-features li {
-        margin-bottom: 0.5rem;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        margin-top: 2rem;
-    }
-
-    .btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem 1.5rem;
-        text-decoration: none;
-        border-radius: 6px;
-        font-weight: 500;
-        transition: all 0.2s;
-    }
-
-    .btn-primary {
-        background-color: var(--bs-primary);
-        color: white;
-        border: 2px solid var(--bs-primary);
-    }
-
-    .btn-primary:hover {
-        background-color: var(--bs-primary);
-        opacity: 0.9;
-        color: white;
-    }
-
-    .btn-secondary {
-        background-color: transparent;
-        color: var(--bs-primary);
-        border: 2px solid var(--bs-primary);
-    }
-
-    .btn-secondary:hover {
-        background-color: var(--bs-primary);
-        color: white;
-    }
-</style>
