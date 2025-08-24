@@ -1,0 +1,422 @@
+@page "/file-ingestion"
+@using Microsoft.AspNetCore.Authorization
+@using MAK3R.PWA.Services
+@inject IFileIngestionService IngestionService
+@inject IJSRuntime JSRuntime
+@inject ILogger<FileIngestion> Logger
+@attribute [AllowAnonymous]
+
+<div class="file-ingestion">
+    <div class="ingestion-header">
+        <div class="header-content">
+            <h1>File Ingestion & Schema Inference</h1>
+            <p>Automatically analyze and import data files with intelligent schema detection</p>
+        </div>
+    </div>
+
+    <div class="ingestion-workspace">
+        @if (currentStep == IngestionStep.Upload)
+        {
+            <div class="upload-section">
+                <div class="upload-card">
+                    <div class="upload-icon">
+                        <span class="material-symbols-outlined">upload_file</span>
+                    </div>
+                    <h3>Upload Data File</h3>
+                    <p>Support formats: CSV, JSON</p>
+                    
+                    <InputFile OnChange="HandleFileSelected" accept=".csv,.json" />
+                    
+                    <div class="supported-formats">
+                        <h4>Supported Formats</h4>
+                        <ul>
+                            <li><strong>CSV:</strong> Comma-separated values with headers</li>
+                            <li><strong>JSON:</strong> Array of objects or single object</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="templates-section">
+                        <h4>Import Templates</h4>
+                        <div class="template-grid">
+                            @foreach (var template in importTemplates)
+                            {
+                                <div class="template-card" @onclick="() => SelectTemplate(template)">
+                                    <h5>@template.Name</h5>
+                                    <p>@template.Description</p>
+                                    <div class="template-headers">
+                                        @foreach (var header in template.SampleHeaders.Take(3))
+                                        {
+                                            <span class="header-tag">@header</span>
+                                        }
+                                        @if (template.SampleHeaders.Count > 3)
+                                        {
+                                            <span class="more-headers">+@(template.SampleHeaders.Count - 3) more</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        
+        @if (currentStep == IngestionStep.Analysis && fileAnalysis != null)
+        {
+            <div class="analysis-section">
+                <div class="analysis-header">
+                    <h3>File Analysis Results</h3>
+                    <div class="file-info">
+                        <span><strong>File:</strong> @fileAnalysis.FileName</span>
+                        <span><strong>Size:</strong> @FormatFileSize(fileAnalysis.FileSize)</span>
+                        <span><strong>Records:</strong> @fileAnalysis.EstimatedRecordCount</span>
+                        <span><strong>Columns:</strong> @fileAnalysis.DetectedColumns.Count</span>
+                    </div>
+                </div>
+
+                @if (!fileAnalysis.IsValid)
+                {
+                    <div class="error-panel">
+                        <h4>Issues Found</h4>
+                        @foreach (var issue in fileAnalysis.Issues)
+                        {
+                            <div class="error-item">@issue</div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="columns-preview">
+                        <h4>Detected Columns</h4>
+                        <div class="columns-grid">
+                            @foreach (var column in fileAnalysis.DetectedColumns.Take(10))
+                            {
+                                <div class="column-card">
+                                    <div class="column-name">@column</div>
+                                    <div class="column-type">@fileAnalysis.ColumnTypes.GetValueOrDefault(column, DataType.Unknown)</div>
+                                </div>
+                            }
+                        </div>
+                        @if (fileAnalysis.DetectedColumns.Count > 10)
+                        {
+                            <p class="more-columns">And @(fileAnalysis.DetectedColumns.Count - 10) more columns...</p>
+                        }
+                    </div>
+
+                    <div class="sample-data">
+                        <h4>Sample Data</h4>
+                        <div class="data-preview">
+                            @foreach (var sample in fileAnalysis.SampleData)
+                            {
+                                <div class="sample-row">@sample</div>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="analysis-actions">
+                        <button class="btn-secondary" @onclick="ResetIngestion">
+                            <span class="material-symbols-outlined">arrow_back</span>
+                            Back to Upload
+                        </button>
+                        <button class="btn-primary" @onclick="ProceedToSchemaInference" disabled="@isProcessing">
+                            @if (isProcessing)
+                            {
+                                <span class="material-symbols-outlined spinning">progress_activity</span>
+                                <text>Analyzing Schema</text>
+                            }
+                            else
+                            {
+                                <span class="material-symbols-outlined">psychology</span>
+                                <text>Infer Schema</text>
+                            }
+                        </button>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (currentStep == IngestionStep.SchemaInference && schemaResult != null)
+        {
+            <div class="schema-section">
+                <div class="schema-header">
+                    <h3>Schema Inference Results</h3>
+                    <div class="confidence-score">
+                        <span>Confidence: </span>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: @(schemaResult.ConfidenceScore * 100)%"></div>
+                        </div>
+                        <span>@(schemaResult.ConfidenceScore.ToString("P0"))</span>
+                    </div>
+                </div>
+
+                <div class="entity-type">
+                    <h4>Detected Entity Type</h4>
+                    <span class="entity-badge">@schemaResult.RecommendedEntityType</span>
+                </div>
+
+                <div class="field-mappings">
+                    <h4>Suggested Field Mappings</h4>
+                    <div class="mappings-grid">
+                        @foreach (var mapping in schemaResult.SuggestedMappings.Take(8))
+                        {
+                            <div class="mapping-card">
+                                <div class="source-field">@mapping.SourceField</div>
+                                <div class="mapping-arrow">→</div>
+                                <div class="target-field">@mapping.TargetField</div>
+                                <div class="mapping-confidence">@(mapping.ConfidenceScore.ToString("P0"))</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @if (schemaResult.ValidationWarnings.Any())
+                {
+                    <div class="warnings-panel">
+                        <h4>Warnings</h4>
+                        @foreach (var warning in schemaResult.ValidationWarnings)
+                        {
+                            <div class="warning-item">@warning</div>
+                        }
+                    </div>
+                }
+
+                <div class="schema-actions">
+                    <button class="btn-secondary" @onclick="BackToAnalysis">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                        Back to Analysis
+                    </button>
+                    <button class="btn-primary" @onclick="ProceedToImport" disabled="@isProcessing">
+                        @if (isProcessing)
+                        {
+                            <span class="material-symbols-outlined spinning">progress_activity</span>
+                            <text>Starting Import</text>
+                        }
+                        else
+                        {
+                            <span class="material-symbols-outlined">file_download</span>
+                            <text>Import Data</text>
+                        }
+                    </button>
+                </div>
+            </div>
+        }
+
+        @if (currentStep == IngestionStep.Import && importResult != null)
+        {
+            <div class="import-section">
+                <div class="import-header">
+                    <h3>Import Results</h3>
+                    <div class="import-stats">
+                        <div class="stat-card success">
+                            <div class="stat-number">@importResult.SuccessfulImports</div>
+                            <div class="stat-label">Successful</div>
+                        </div>
+                        <div class="stat-card error">
+                            <div class="stat-number">@importResult.Errors</div>
+                            <div class="stat-label">Errors</div>
+                        </div>
+                        <div class="stat-card total">
+                            <div class="stat-number">@importResult.TotalRecords</div>
+                            <div class="stat-label">Total</div>
+                        </div>
+                        <div class="stat-card time">
+                            <div class="stat-number">@(importResult.ProcessingTime.TotalSeconds.ToString("F1"))s</div>
+                            <div class="stat-label">Time</div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (importResult.ErrorDetails.Any())
+                {
+                    <div class="errors-panel">
+                        <h4>Import Errors</h4>
+                        <div class="errors-list">
+                            @foreach (var error in importResult.ErrorDetails.Take(10))
+                            {
+                                <div class="error-detail">
+                                    <div class="error-location">Row @error.RowNumber, Field: @error.Field</div>
+                                    <div class="error-message">@error.Error</div>
+                                    @if (!string.IsNullOrEmpty(error.Value))
+                                    {
+                                        <div class="error-value">Value: @error.Value</div>
+                                    }
+                                </div>
+                            }
+                            @if (importResult.ErrorDetails.Count > 10)
+                            {
+                                <p class="more-errors">And @(importResult.ErrorDetails.Count - 10) more errors...</p>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <div class="import-actions">
+                    <button class="btn-secondary" @onclick="ResetIngestion">
+                        <span class="material-symbols-outlined">refresh</span>
+                        Import Another File
+                    </button>
+                    <button class="btn-primary" @onclick="ViewImportedData">
+                        <span class="material-symbols-outlined">visibility</span>
+                        View Imported Data
+                    </button>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private enum IngestionStep
+    {
+        Upload,
+        Analysis,
+        SchemaInference,
+        Import
+    }
+
+    private IngestionStep currentStep = IngestionStep.Upload;
+    private bool isProcessing = false;
+    private IBrowserFile? selectedFile;
+    private FileAnalysisResult? fileAnalysis;
+    private SchemaInferenceResult? schemaResult;
+    private DataImportResult? importResult;
+    private ImportMapping? currentMapping;
+    private List<ImportTemplate> importTemplates = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            importTemplates = await IngestionService.GetImportTemplatesAsync();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading import templates");
+        }
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        
+        if (selectedFile != null)
+        {
+            await AnalyzeFile();
+        }
+    }
+
+    private async Task AnalyzeFile()
+    {
+        if (selectedFile == null) return;
+
+        try
+        {
+            isProcessing = true;
+            currentStep = IngestionStep.Analysis;
+
+            using var stream = selectedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10MB limit
+            fileAnalysis = await IngestionService.AnalyzeFileAsync(stream, selectedFile.Name);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error analyzing file {FileName}", selectedFile.Name);
+            await JSRuntime.InvokeVoidAsync("alert", $"Error analyzing file: {ex.Message}");
+            ResetIngestion();
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+
+    private async Task ProceedToSchemaInference()
+    {
+        if (selectedFile == null || fileAnalysis == null || !fileAnalysis.IsValid) return;
+
+        try
+        {
+            isProcessing = true;
+            
+            using var stream = selectedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+            schemaResult = await IngestionService.InferSchemaAsync(stream, selectedFile.Name);
+            
+            currentStep = IngestionStep.SchemaInference;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error inferring schema for file {FileName}", selectedFile.Name);
+            await JSRuntime.InvokeVoidAsync("alert", $"Error inferring schema: {ex.Message}");
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+
+    private async Task ProceedToImport()
+    {
+        if (selectedFile == null || schemaResult == null) return;
+
+        try
+        {
+            isProcessing = true;
+
+            // Create import mapping from suggested mappings
+            currentMapping = new ImportMapping
+            {
+                EntityType = schemaResult.RecommendedEntityType,
+                FieldMappings = schemaResult.SuggestedMappings.ToDictionary(m => m.SourceField, m => m.TargetField),
+                SkipFirstRow = true
+            };
+
+            using var stream = selectedFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+            importResult = await IngestionService.ImportDataAsync(stream, selectedFile.Name, currentMapping);
+            
+            currentStep = IngestionStep.Import;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error importing data from file {FileName}", selectedFile.Name);
+            await JSRuntime.InvokeVoidAsync("alert", $"Error importing data: {ex.Message}");
+        }
+        finally
+        {
+            isProcessing = false;
+        }
+    }
+
+    private void SelectTemplate(ImportTemplate template)
+    {
+        // Placeholder for template selection
+        JSRuntime.InvokeVoidAsync("alert", $"Template '{template.Name}' selected. Template-based import coming soon!");
+    }
+
+    private void BackToAnalysis()
+    {
+        currentStep = IngestionStep.Analysis;
+    }
+
+    private void ResetIngestion()
+    {
+        currentStep = IngestionStep.Upload;
+        selectedFile = null;
+        fileAnalysis = null;
+        schemaResult = null;
+        importResult = null;
+        currentMapping = null;
+        isProcessing = false;
+    }
+
+    private void ViewImportedData()
+    {
+        // Navigate to shopfront builder or relevant data view
+        JSRuntime.InvokeVoidAsync("alert", "Navigating to imported data view...");
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        if (bytes < 1024) return $"{bytes} B";
+        if (bytes < 1024 * 1024) return $"{bytes / 1024.0:F1} KB";
+        return $"{bytes / (1024.0 * 1024.0):F1} MB";
+    }
+}

@@ -1,0 +1,44 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  DOTNET_VERSION: '8.0.x'
+
+jobs:
+  validate:
+    name: Validate PR
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Check formatting
+      run: dotnet format --verify-no-changes --verbosity diagnostic
+      
+    - name: Build
+      run: dotnet build --no-restore --configuration Release --verbosity minimal
+      
+    - name: Run fast tests
+      run: dotnet test tests/MAK3R.UnitTests --no-build --configuration Release --verbosity minimal
+      
+    - name: Analyze with SonarCloud (if configured)
+      if: env.SONAR_TOKEN != ''
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        dotnet tool install --global dotnet-sonarscanner
+        dotnet sonarscanner begin /k:"MAK3R-Cluster" /o:"mak3r-ai" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+        dotnet build
+        dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"

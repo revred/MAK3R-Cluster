@@ -40,7 +40,8 @@
       "Bash(powershell:*)",
       "Bash(start http://localhost:9080)",
       "Bash(git commit:*)",
-      "Bash(dotnet clean:*)"
+      "Bash(dotnet clean:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []

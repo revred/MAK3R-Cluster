@@ -1,0 +1,458 @@
+@page "/anomaly-workbench"
+@using Microsoft.AspNetCore.SignalR.Client
+@using MAK3R.Core.Hubs
+@using System.Text.Json
+@implements IAsyncDisposable
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Anomaly Workbench - MAK3R</PageTitle>
+
+<div class="anomaly-workbench">
+    <div class="workbench-header">
+        <div class="header-content">
+            <h1>
+                <span class="material-symbols-outlined">science</span>
+                Anomaly Workbench
+            </h1>
+            <div class="header-stats">
+                <div class="stat-card critical">
+                    <span class="stat-value">@criticalCount</span>
+                    <span class="stat-label">Critical</span>
+                </div>
+                <div class="stat-card warning">
+                    <span class="stat-value">@warningCount</span>
+                    <span class="stat-label">Warnings</span>
+                </div>
+                <div class="stat-card info">
+                    <span class="stat-value">@infoCount</span>
+                    <span class="stat-label">Info</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="action-btn primary" @onclick="CreateRule">
+                    <span class="material-symbols-outlined">add</span>
+                    Create Rule
+                </button>
+                <button class="action-btn secondary" @onclick="RefreshRules">
+                    <span class="material-symbols-outlined">refresh</span>
+                    Refresh
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="workbench-content">
+        <!-- Rules Panel -->
+        <div class="rules-panel">
+            <div class="panel-header">
+                <h2>Detection Rules</h2>
+                <div class="rule-count">@rules.Count Active</div>
+            </div>
+            
+            <div class="rules-list">
+                @foreach (var rule in rules)
+                {
+                    <div class="rule-card @(rule.IsEnabled ? "enabled" : "disabled")">
+                        <div class="rule-header">
+                            <div class="rule-info">
+                                <h4>@rule.Name</h4>
+                                <span class="rule-type">@rule.Type</span>
+                            </div>
+                            <div class="rule-controls">
+                                <button class="toggle-btn @(rule.IsEnabled ? "on" : "off")"
+                                        @onclick="() => ToggleRule(rule.Id)">
+                                    <span class="material-symbols-outlined">
+                                        @(rule.IsEnabled ? "toggle_on" : "toggle_off")
+                                    </span>
+                                </button>
+                                <button class="edit-btn" @onclick="() => EditRule(rule.Id)">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="rule-condition">
+                            <code>@rule.Condition</code>
+                        </div>
+                        
+                        <div class="rule-footer">
+                            <div class="rule-stats">
+                                <span class="trigger-count">
+                                    @rule.TriggerCount triggers today
+                                </span>
+                                <span class="accuracy">
+                                    @(rule.Accuracy.ToString("P1")) accuracy
+                                </span>
+                            </div>
+                            <div class="rule-severity @GetSeverityClass(rule.Severity)">
+                                @rule.Severity
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            
+            @if (showRuleEditor)
+            {
+                <div class="rule-editor-modal">
+                    <div class="modal-backdrop" @onclick="CloseRuleEditor"></div>
+                    <div class="rule-editor">
+                        <div class="editor-header">
+                            <h3>@(editingRule?.Name ?? "New Rule")</h3>
+                            <button class="close-btn" @onclick="CloseRuleEditor">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        
+                        <div class="editor-form">
+                            <div class="form-group">
+                                <label>Rule Name</label>
+                                <input type="text" @bind="editingRule.Name" class="form-input" />
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Type</label>
+                                <select @bind="editingRule.Type" class="form-select">
+                                    <option value="Threshold">Threshold</option>
+                                    <option value="Pattern">Pattern</option>
+                                    <option value="Statistical">Statistical</option>
+                                    <option value="ML">Machine Learning</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Condition</label>
+                                <textarea @bind="editingRule.Condition" class="form-textarea" rows="4"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Severity</label>
+                                <select @bind="editingRule.Severity" class="form-select">
+                                    <option value="Low">Low</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="High">High</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="editor-actions">
+                            <button class="action-btn secondary" @onclick="CloseRuleEditor">Cancel</button>
+                            <button class="action-btn primary" @onclick="SaveRule">Save Rule</button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Anomalies Panel -->
+        <div class="anomalies-panel">
+            <div class="panel-header">
+                <h2>Live Anomalies</h2>
+                <div class="connection-status @(IsConnected ? "connected" : "disconnected")">
+                    <span class="material-symbols-outlined">
+                        @(IsConnected ? "wifi" : "wifi_off")
+                    </span>
+                    @(IsConnected ? "Connected" : "Disconnected")
+                </div>
+            </div>
+            
+            <div class="anomalies-list">
+                @if (anomalies.Any())
+                {
+                    @foreach (var anomaly in anomalies)
+                    {
+                        <div class="anomaly-card @GetSeverityClass(anomaly.Severity)">
+                            <div class="anomaly-header">
+                                <div class="anomaly-icon">
+                                    <span class="material-symbols-outlined">@GetAnomalyIcon(anomaly.Type)</span>
+                                </div>
+                                <div class="anomaly-info">
+                                    <h4>@anomaly.Type - @anomaly.MachineName</h4>
+                                    <span class="anomaly-time">@GetTimeAgo(anomaly.Timestamp)</span>
+                                </div>
+                                <div class="anomaly-severity">@anomaly.Severity</div>
+                            </div>
+                            
+                            <div class="anomaly-description">@anomaly.Description</div>
+                            
+                            @if (anomaly.Context?.Any() == true)
+                            {
+                                <div class="anomaly-context">
+                                    @foreach (var item in anomaly.Context)
+                                    {
+                                        <div class="context-item">
+                                            <span class="context-key">@item.Key:</span>
+                                            <span class="context-value">@item.Value</span>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            
+                            <div class="anomaly-actions">
+                                <button class="action-btn small" @onclick="() => AcknowledgeAnomaly(anomaly.Id)">
+                                    Acknowledge
+                                </button>
+                                <button class="action-btn small" @onclick="() => CreateWorkOrder(anomaly.Id)">
+                                    Create Work Order
+                                </button>
+                                <button class="action-btn small" @onclick="() => ViewDetails(anomaly.Id)">
+                                    Details
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="no-anomalies">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <h3>No anomalies detected</h3>
+                        <p>All systems are operating normally</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private HubConnection? hubConnection;
+    private List<AnomalyAlert> anomalies = new();
+    private List<AnomalyRule> rules = new();
+    private int criticalCount = 0;
+    private int warningCount = 0;
+    private int infoCount = 0;
+    private bool showRuleEditor = false;
+    private AnomalyRule editingRule = new();
+
+    public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
+
+    protected override async Task OnInitializedAsync()
+    {
+        InitializeRules();
+        
+        // Setup SignalR connection
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl("http://localhost:5137/hubs/machinedata")
+            .Build();
+
+        hubConnection.On<AnomalyAlert>("AnomalyDetected", OnAnomalyDetected);
+
+        await hubConnection.StartAsync();
+        await hubConnection.SendAsync("JoinDashboard");
+    }
+
+    private void InitializeRules()
+    {
+        rules = new List<AnomalyRule>
+        {
+            new()
+            {
+                Id = "temp-high",
+                Name = "High Temperature Alert",
+                Type = "Threshold",
+                Condition = "temperature > 85°C for > 5 minutes",
+                Severity = "High",
+                IsEnabled = true,
+                TriggerCount = 3,
+                Accuracy = 0.94
+            },
+            new()
+            {
+                Id = "vibration-spike",
+                Name = "Vibration Spike Detection", 
+                Type = "Statistical",
+                Condition = "vibration > 2.5σ from baseline",
+                Severity = "Medium",
+                IsEnabled = true,
+                TriggerCount = 8,
+                Accuracy = 0.87
+            },
+            new()
+            {
+                Id = "efficiency-drop",
+                Name = "Efficiency Drop Pattern",
+                Type = "Pattern",
+                Condition = "efficiency declining > 10% over 1 hour",
+                Severity = "Medium",
+                IsEnabled = true,
+                TriggerCount = 2,
+                Accuracy = 0.91
+            },
+            new()
+            {
+                Id = "predictive-failure",
+                Name = "Predictive Failure Model",
+                Type = "ML",
+                Condition = "ML model confidence > 80%",
+                Severity = "High",
+                IsEnabled = false,
+                TriggerCount = 1,
+                Accuracy = 0.76
+            }
+        };
+    }
+
+    private async Task OnAnomalyDetected(AnomalyAlert alert)
+    {
+        anomalies.Insert(0, alert);
+        if (anomalies.Count > 50)
+        {
+            anomalies = anomalies.Take(50).ToList();
+        }
+        
+        UpdateCounts();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateCounts()
+    {
+        criticalCount = anomalies.Count(a => a.Severity == "High");
+        warningCount = anomalies.Count(a => a.Severity == "Medium");
+        infoCount = anomalies.Count(a => a.Severity == "Low");
+    }
+
+    private void CreateRule()
+    {
+        editingRule = new AnomalyRule { Id = Guid.NewGuid().ToString() };
+        showRuleEditor = true;
+        StateHasChanged();
+    }
+
+    private void EditRule(string ruleId)
+    {
+        var rule = rules.FirstOrDefault(r => r.Id == ruleId);
+        if (rule != null)
+        {
+            editingRule = new AnomalyRule
+            {
+                Id = rule.Id,
+                Name = rule.Name,
+                Type = rule.Type,
+                Condition = rule.Condition,
+                Severity = rule.Severity,
+                IsEnabled = rule.IsEnabled
+            };
+            showRuleEditor = true;
+            StateHasChanged();
+        }
+    }
+
+    private void CloseRuleEditor()
+    {
+        showRuleEditor = false;
+        editingRule = new();
+        StateHasChanged();
+    }
+
+    private async Task SaveRule()
+    {
+        if (string.IsNullOrWhiteSpace(editingRule.Name) || string.IsNullOrWhiteSpace(editingRule.Condition))
+            return;
+
+        var existingRule = rules.FirstOrDefault(r => r.Id == editingRule.Id);
+        if (existingRule != null)
+        {
+            existingRule.Name = editingRule.Name;
+            existingRule.Type = editingRule.Type;
+            existingRule.Condition = editingRule.Condition;
+            existingRule.Severity = editingRule.Severity;
+            existingRule.IsEnabled = editingRule.IsEnabled;
+        }
+        else
+        {
+            rules.Add(new AnomalyRule
+            {
+                Id = editingRule.Id,
+                Name = editingRule.Name,
+                Type = editingRule.Type,
+                Condition = editingRule.Condition,
+                Severity = editingRule.Severity,
+                IsEnabled = true,
+                TriggerCount = 0,
+                Accuracy = 0.0
+            });
+        }
+
+        CloseRuleEditor();
+        await JSRuntime.InvokeVoidAsync("console.log", $"Saved rule: {editingRule.Name}");
+    }
+
+    private async Task ToggleRule(string ruleId)
+    {
+        var rule = rules.FirstOrDefault(r => r.Id == ruleId);
+        if (rule != null)
+        {
+            rule.IsEnabled = !rule.IsEnabled;
+            StateHasChanged();
+            await JSRuntime.InvokeVoidAsync("console.log", $"Toggled rule {rule.Name}: {rule.IsEnabled}");
+        }
+    }
+
+    private async Task RefreshRules()
+    {
+        await JSRuntime.InvokeVoidAsync("console.log", "Refreshing rules...");
+        StateHasChanged();
+    }
+
+    private async Task AcknowledgeAnomaly(string anomalyId)
+    {
+        await JSRuntime.InvokeVoidAsync("console.log", $"Acknowledged anomaly: {anomalyId}");
+    }
+
+    private async Task CreateWorkOrder(string anomalyId)
+    {
+        await JSRuntime.InvokeVoidAsync("console.log", $"Creating work order for anomaly: {anomalyId}");
+    }
+
+    private async Task ViewDetails(string anomalyId)
+    {
+        await JSRuntime.InvokeVoidAsync("console.log", $"Viewing details for anomaly: {anomalyId}");
+    }
+
+    private static string GetSeverityClass(string severity) => severity.ToLower() switch
+    {
+        "high" => "high-severity",
+        "medium" => "medium-severity",
+        "low" => "low-severity",
+        _ => "low-severity"
+    };
+
+    private static string GetAnomalyIcon(string type) => type.ToLower() switch
+    {
+        "temperature" => "thermostat",
+        "vibration" => "vibration",
+        "performance" => "trending_down",
+        "quality" => "grade",
+        _ => "warning"
+    };
+
+    private static string GetTimeAgo(DateTime timestamp)
+    {
+        var timeAgo = DateTime.UtcNow - timestamp;
+        return timeAgo.TotalMinutes < 1 ? "Just now" :
+               timeAgo.TotalHours < 1 ? $"{(int)timeAgo.TotalMinutes}m ago" :
+               timeAgo.TotalDays < 1 ? $"{(int)timeAgo.TotalHours}h ago" :
+               $"{(int)timeAgo.TotalDays}d ago";
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+
+    private class AnomalyRule
+    {
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = "Threshold";
+        public string Condition { get; set; } = "";
+        public string Severity { get; set; } = "Medium";
+        public bool IsEnabled { get; set; } = true;
+        public int TriggerCount { get; set; } = 0;
+        public double Accuracy { get; set; } = 0.0;
+    }
+}

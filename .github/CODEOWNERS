@@ -1,0 +1,23 @@
+# Global owners
+* @mak3r-ai/core-team
+
+# Frontend/PWA changes
+/apps/MAK3R.PWA/ @mak3r-ai/frontend-team
+/libs/MAK3R.UI/ @mak3r-ai/frontend-team
+
+# Backend API changes
+/services/ @mak3r-ai/backend-team
+/libs/MAK3R.Core/ @mak3r-ai/backend-team
+/libs/MAK3R.Data/ @mak3r-ai/backend-team
+
+# Connectors/Integration changes
+/mcps/ @mak3r-ai/integration-team
+/edges/ @mak3r-ai/integration-team
+
+# Infrastructure changes
+/.github/ @mak3r-ai/devops-team
+/scripts/ @mak3r-ai/devops-team
+
+# Security-sensitive files
+/Directory.Packages.props @mak3r-ai/security-team
+/global.json @mak3r-ai/security-team

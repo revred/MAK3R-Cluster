@@ -1,0 +1,407 @@
+@page "/shopfront-builder"
+@using Microsoft.AspNetCore.Authorization
+@using MAK3R.PWA.Models
+@using MAK3R.PWA.Services
+@inject IProductService ProductService
+@inject IJSRuntime JSRuntime
+@inject ILogger<ShopfrontBuilder> Logger
+@attribute [AllowAnonymous]
+
+<div class="shopfront-builder">
+    <div class="builder-header">
+        <div class="header-content">
+            <h1>Shopfront Builder</h1>
+            <p>Create and manage your digital product catalog with intelligent content management</p>
+        </div>
+        <div class="header-actions">
+            <button class="btn-primary" @onclick="CreateNewProduct">
+                <span class="material-symbols-outlined">add</span>
+                New Product
+            </button>
+            <button class="btn-secondary" @onclick="ImportProducts">
+                <span class="material-symbols-outlined">upload_file</span>
+                Import
+            </button>
+        </div>
+    </div>
+
+    <div class="builder-workspace">
+        <!-- Product Grid -->
+        <div class="product-grid-section">
+            <div class="section-header">
+                <h3>Product Catalog</h3>
+                <div class="grid-controls">
+                    <button class="view-toggle @(gridView ? "active" : "")" @onclick="() => SetGridView(true)">
+                        <span class="material-symbols-outlined">grid_view</span>
+                    </button>
+                    <button class="view-toggle @(!gridView ? "active" : "")" @onclick="() => SetGridView(false)">
+                        <span class="material-symbols-outlined">list</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="product-grid @(gridView ? "grid-layout" : "list-layout")">
+                @if (products.Any())
+                {
+                    @foreach (var product in products)
+                    {
+                        <div class="product-card @(selectedProduct?.Id == product.Id ? "selected" : "")" 
+                             @onclick="() => SelectProduct(product)">
+                            <div class="product-image">
+                                @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                {
+                                    <img src="@product.ImageUrl" alt="@product.Name" />
+                                }
+                                else
+                                {
+                                    <div class="placeholder-image">
+                                        <span class="material-symbols-outlined">image</span>
+                                    </div>
+                                }
+                            </div>
+                            <div class="product-info">
+                                <h4>@product.Name</h4>
+                                <p class="product-sku">SKU: @product.Sku</p>
+                                <p class="product-price">$@product.Price.ToString("F2")</p>
+                                <div class="product-badges">
+                                    <span class="status-badge @(product.IsActive ? "active" : "inactive")">
+                                        @(product.IsActive ? "Active" : "Inactive")
+                                    </span>
+                                    @if (product.HasDigitalTwin)
+                                    {
+                                        <span class="twin-badge @product.TwinStatus.ToString().ToLower()">
+                                            <span class="material-symbols-outlined">account_tree</span>
+                                            @product.TwinStatus
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <button class="create-twin-btn" @onclick:stopPropagation="true" @onclick="() => CreateDigitalSkeleton(product)">
+                                            <span class="material-symbols-outlined">add</span>
+                                            Create Twin
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                            <div class="product-actions">
+                                <button class="btn-icon" @onclick:stopPropagation="true" @onclick="() => EditProduct(product)">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </button>
+                                <button class="btn-icon" @onclick:stopPropagation="true" @onclick="() => DeleteProduct(product)">
+                                    <span class="material-symbols-outlined">delete</span>
+                                </button>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="empty-state">
+                        <span class="material-symbols-outlined">storefront</span>
+                        <h4>No products yet</h4>
+                        <p>Start building your catalog by creating your first product</p>
+                        <button class="btn-primary" @onclick="CreateNewProduct">Create Product</button>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Product Editor Panel -->
+        @if (selectedProduct != null || isCreatingNew)
+        {
+            <div class="product-editor">
+                <div class="editor-header">
+                    <h3>@(isCreatingNew ? "Create New Product" : "Edit Product")</h3>
+                    <button class="btn-close" @onclick="CloseEditor">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                
+                <div class="editor-form">
+                    <div class="form-section">
+                        <h4>Basic Information</h4>
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input type="text" @bind="editingProduct.Name" placeholder="Enter product name" />
+                        </div>
+                        <div class="form-group">
+                            <label>SKU</label>
+                            <input type="text" @bind="editingProduct.Sku" placeholder="Enter SKU" />
+                        </div>
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea @bind="editingProduct.Description" placeholder="Product description" rows="4"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>Pricing & Status</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Price</label>
+                                <input type="number" @bind="editingProduct.Price" min="0" step="0.01" />
+                            </div>
+                            <div class="form-group">
+                                <label>Status</label>
+                                <select @bind="editingProduct.IsActive">
+                                    <option value="true">Active</option>
+                                    <option value="false">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h4>Product Image</h4>
+                        <div class="image-upload">
+                            <input type="file" id="imageUpload" accept="image/*" @onchange="HandleImageUpload" />
+                            <label for="imageUpload" class="upload-area">
+                                @if (!string.IsNullOrEmpty(editingProduct.ImageUrl))
+                                {
+                                    <img src="@editingProduct.ImageUrl" alt="Preview" />
+                                }
+                                else
+                                {
+                                    <span class="material-symbols-outlined">add_photo_alternate</span>
+                                    <p>Click to upload image</p>
+                                }
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="editor-actions">
+                        <button class="btn-secondary" @onclick="CloseEditor">Cancel</button>
+                        <button class="btn-primary" @onclick="SaveProduct">
+                            @(isCreatingNew ? "Create Product" : "Save Changes")
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private List<Product> products = new();
+    private Product? selectedProduct;
+    private Product editingProduct = new();
+    private bool gridView = true;
+    private bool isCreatingNew = false;
+    private bool isLoading = false;
+    private string searchTerm = string.Empty;
+    private ProductFilter currentFilter = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        isLoading = true;
+        try
+        {
+            products = await ProductService.GetProductsAsync(currentFilter);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error loading products");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void SetGridView(bool isGrid)
+    {
+        gridView = isGrid;
+    }
+
+    private void SelectProduct(Product product)
+    {
+        selectedProduct = product;
+        editingProduct = new Product
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Sku = product.Sku,
+            Description = product.Description,
+            Price = product.Price,
+            ImageUrl = product.ImageUrl,
+            IsActive = product.IsActive,
+            CreatedAt = product.CreatedAt
+        };
+        isCreatingNew = false;
+    }
+
+    private void CreateNewProduct()
+    {
+        editingProduct = new Product();
+        selectedProduct = null;
+        isCreatingNew = true;
+    }
+
+    private void EditProduct(Product product)
+    {
+        SelectProduct(product);
+    }
+
+    private void CloseEditor()
+    {
+        selectedProduct = null;
+        editingProduct = new Product();
+        isCreatingNew = false;
+    }
+
+    private async Task SaveProduct()
+    {
+        try
+        {
+            isLoading = true;
+            
+            if (isCreatingNew)
+            {
+                await ProductService.CreateProductAsync(editingProduct);
+            }
+            else if (selectedProduct != null)
+            {
+                await ProductService.UpdateProductAsync(editingProduct);
+            }
+            
+            await LoadProducts();
+            CloseEditor();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error saving product");
+            await JSRuntime.InvokeVoidAsync("alert", $"Error saving product: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task DeleteProduct(Product product)
+    {
+        if (await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete '{product.Name}'?"))
+        {
+            try
+            {
+                isLoading = true;
+                await ProductService.DeleteProductAsync(product.Id);
+                await LoadProducts();
+                
+                if (selectedProduct?.Id == product.Id)
+                {
+                    CloseEditor();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error deleting product");
+                await JSRuntime.InvokeVoidAsync("alert", $"Error deleting product: {ex.Message}");
+            }
+            finally
+            {
+                isLoading = false;
+            }
+        }
+    }
+
+    private async Task ImportProducts()
+    {
+        await JSRuntime.InvokeVoidAsync("alert", "Import functionality coming soon!");
+    }
+
+    private async Task HandleImageUpload(ChangeEventArgs e)
+    {
+        // Placeholder for image upload functionality
+        await Task.CompletedTask;
+    }
+
+    private async Task CreateDigitalSkeleton(Product product)
+    {
+        try
+        {
+            isLoading = true;
+            var success = await ProductService.CreateDigitalSkeletonAsync(product.Id);
+            
+            if (success)
+            {
+                await LoadProducts();
+                await JSRuntime.InvokeVoidAsync("alert", $"Digital skeleton created for {product.Name}");
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Failed to create digital skeleton");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error creating digital skeleton for product {ProductId}", product.Id);
+            await JSRuntime.InvokeVoidAsync("alert", $"Error creating digital skeleton: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task UpgradeDigitalTwin(Product product)
+    {
+        try
+        {
+            isLoading = true;
+            var success = await ProductService.UpgradeToDigitalTwinAsync(product.Id);
+            
+            if (success)
+            {
+                await LoadProducts();
+                await JSRuntime.InvokeVoidAsync("alert", $"Digital twin upgraded for {product.Name}");
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Failed to upgrade digital twin");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error upgrading digital twin for product {ProductId}", product.Id);
+            await JSRuntime.InvokeVoidAsync("alert", $"Error upgrading digital twin: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SyncDigitalTwin(Product product)
+    {
+        try
+        {
+            isLoading = true;
+            var success = await ProductService.SyncDigitalTwinAsync(product.Id);
+            
+            if (success)
+            {
+                await LoadProducts();
+                await JSRuntime.InvokeVoidAsync("alert", $"Digital twin synced for {product.Name}");
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Failed to sync digital twin");
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error syncing digital twin for product {ProductId}", product.Id);
+            await JSRuntime.InvokeVoidAsync("alert", $"Error syncing digital twin: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+}

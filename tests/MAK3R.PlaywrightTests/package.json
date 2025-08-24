@@ -1,0 +1,16 @@
+{
+  "name": "mak3r-playwright-tests",
+  "version": "1.0.0",
+  "description": "E2E tests for MAK3R platform",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:codegen": "playwright codegen localhost:5225",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}

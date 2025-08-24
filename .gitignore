@@ -370,4 +370,20 @@ FodyWeavers.xsd
 *.log
 
 # Claude Code settings (keep local only)
-.claude/settings.local.json
+# .claude/settings.local.json  # Allow this to be committed for team settings
+
+# Specific build artifacts that need explicit exclusion
+**/bin/Debug/**/*.dll
+**/bin/Debug/**/*.exe
+**/bin/Debug/**/*.pdb
+**/bin/Release/**/*.dll
+**/bin/Release/**/*.exe
+**/bin/Release/**/*.pdb
+**/obj/Debug/**
+**/obj/Release/**
+
+# Additional .NET build artifacts
+*.deps.json
+*.staticwebassets.endpoints.json
+*.staticwebassets.runtime.json
+wwwroot/_framework/**
