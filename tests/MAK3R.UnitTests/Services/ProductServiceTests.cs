@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using MAK3R.PWA.Services;
 using MAK3R.PWA.Models;
+using static MAK3R.PWA.Models.Product;
 
 namespace MAK3R.UnitTests.Services;
 

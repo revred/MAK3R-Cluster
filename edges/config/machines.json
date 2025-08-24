@@ -1,0 +1,101 @@
+{
+  "machines": [
+    {
+      "machineId": "FANUC-TC-01",
+      "make": "FANUC",
+      "model": "30i-B Plus",
+      "ipAddress": "10.10.20.11",
+      "protocol": "FOCAS",
+      "enabled": true,
+      "description": "Turning Center - High Precision Lathe",
+      "settings": {
+        "Port": 8193,
+        "IsSimulator": true,
+        "PollIntervalMs": 500,
+        "TimeoutMs": 10000,
+        "MaxRetries": 3,
+        "EnableEvents": true
+      },
+      "tags": {
+        "department": "machining",
+        "shift": "A",
+        "operator": "john.doe"
+      }
+    },
+    {
+      "machineId": "SIEMENS-TC-02",
+      "make": "SIEMENS", 
+      "model": "840D sl",
+      "ipAddress": "10.10.20.12",
+      "protocol": "OPC UA",
+      "enabled": true,
+      "description": "CNC Turning Center - Advanced Control",
+      "settings": {
+        "EndpointUrl": "opc.tcp://10.10.20.12:4840",
+        "IsSimulator": true,
+        "SecurityPolicy": "None",
+        "SecurityMode": "None",
+        "SessionTimeout": 60000,
+        "PublishingInterval": 1000,
+        "KeepAliveCount": 3
+      },
+      "tags": {
+        "department": "machining",
+        "shift": "B", 
+        "operator": "jane.smith"
+      }
+    },
+    {
+      "machineId": "HAAS-MILL-03",
+      "make": "HAAS",
+      "model": "VF-2SS",
+      "ipAddress": "10.10.20.13", 
+      "protocol": "MTConnect",
+      "enabled": true,
+      "description": "Vertical Machining Center - Super Speed",
+      "settings": {
+        "BaseUrl": "http://10.10.20.13:8082/VF2SS",
+        "IsSimulator": true,
+        "SampleIntervalMs": 1000,
+        "HeartbeatMs": 10000,
+        "BufferSize": 131072,
+        "ConnectTimeout": 5000
+      },
+      "tags": {
+        "department": "milling",
+        "shift": "A",
+        "operator": "mike.wilson"
+      }
+    },
+    {
+      "machineId": "MAZAK-5X-04",
+      "make": "MAZAK",
+      "model": "VARIAXIS j-600",
+      "ipAddress": "10.10.20.14",
+      "protocol": "MTConnect", 
+      "enabled": true,
+      "description": "5-Axis Vertical Machining Center",
+      "settings": {
+        "BaseUrl": "http://10.10.20.14:5000/MAZAK",
+        "IsSimulator": true,
+        "SampleIntervalMs": 1000,
+        "HeartbeatMs": 10000,
+        "BufferSize": 131072,
+        "ConnectTimeout": 5000,
+        "EnablePalletData": true
+      },
+      "tags": {
+        "department": "5-axis",
+        "shift": "C",
+        "operator": "sarah.davis"  
+      }
+    }
+  ],
+  "globalSettings": {
+    "maxConcurrentConnections": 10,
+    "reconnectDelayMs": 5000,
+    "healthCheckIntervalMs": 30000,
+    "eventBatchSize": 50,
+    "enableDiagnostics": true
+  }
+}

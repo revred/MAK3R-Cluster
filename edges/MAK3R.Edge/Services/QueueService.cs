@@ -27,4 +27,5 @@ public class QueueService
     public IAsyncEnumerable<KMachineEvent> ReadAllAsync(CancellationToken ct) => _channel.Reader.ReadAllAsync(ct);
 
     public int ApproxDepth => _channel.Reader.Count;
+    public int Depth => ApproxDepth;
 }

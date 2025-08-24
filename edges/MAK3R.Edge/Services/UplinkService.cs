@@ -53,6 +53,19 @@ public class UplinkService : BackgroundService
             .AddMessagePackProtocol()
             .Build();
 
+        // Register server-side event handlers
+        _hub.On<string, int>("SetSampling", (machineId, intervalMs) =>
+        {
+            _log.LogInformation("Received sampling rate change: {MachineId} -> {IntervalMs}ms", machineId, intervalMs);
+            // TODO: Forward to ConnectorManager to adjust sampling rates
+        });
+
+        _hub.On<string, string, object>("RunMcp", (machineId, tool, args) =>
+        {
+            _log.LogInformation("Received MCP command: {MachineId} {Tool}", machineId, tool);
+            // TODO: Forward to ConnectorManager to execute MCP tool
+        });
+
         var sw = Stopwatch.StartNew();
         await _hub.StartAsync(ct);
         sw.Stop();
@@ -61,6 +74,7 @@ public class UplinkService : BackgroundService
     }
 
     private record BatchFrame(string siteId, string batchId, List<KMachineEvent> events);
+    private record EdgeHeartbeat(string siteId, string edgeId, DateTime timestamp, int queueDepth, Dictionary<string, bool> connectorHealth);
 
     private async Task PumpBatches(CancellationToken ct)
     {
@@ -94,8 +108,13 @@ public class UplinkService : BackgroundService
         try
         {
             if (_hub is null) throw new InvalidOperationException("Hub not connected");
-            await _hub.InvokeAsync("PublishBatch", frame, ct);
+            
+            // Send batch to cluster using Edge-specific hub method
+            await _hub.InvokeAsync("PublishEdgeBatch", frame, ct);
             _db.UpdateBatchAck(id, ok:true);
+            
+            // Send heartbeat periodically
+            await SendHeartbeatIfNeeded(ct);
         }
         catch (Exception ex)
         {
@@ -109,11 +128,39 @@ public class UplinkService : BackgroundService
         }
     }
 
+    private DateTime _lastHeartbeat = DateTime.MinValue;
+
+    private async Task SendHeartbeatIfNeeded(CancellationToken ct)
+    {
+        var now = DateTime.UtcNow;
+        if ((now - _lastHeartbeat).TotalSeconds < 30) return;
+
+        try
+        {
+            var heartbeat = new EdgeHeartbeat(
+                _cfg.SiteId,
+                Environment.MachineName,
+                now,
+                _queue.Depth,
+                new Dictionary<string, bool>() // TODO: Get actual connector health from ConnectorManager
+            );
+
+            await _hub!.InvokeAsync("EdgeHeartbeat", heartbeat, ct);
+            _lastHeartbeat = now;
+            _log.LogDebug("Sent edge heartbeat");
+        }
+        catch (Exception ex)
+        {
+            _log.LogWarning(ex, "Failed to send heartbeat");
+        }
+    }
+
     private async Task SpoolAsync(string batchId, byte[] payload)
     {
         var dir = Path.Combine(_cfg.Storage.Root, "spool");
         Directory.CreateDirectory(dir);
         var path = Path.Combine(dir, $"{DateTime.UtcNow:yyyyMMddHHmmss}_{batchId}.mpack");
         await File.WriteAllBytesAsync(path, payload);
+        _log.LogInformation("Spooled batch {BatchId} for offline replay ({Bytes} bytes)", batchId, payload.Length);
     }
 }

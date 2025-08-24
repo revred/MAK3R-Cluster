@@ -1,0 +1,48 @@
+[Unit]
+Description=MAK3R Edge Runtime for Industrial Machine Connectivity
+Documentation=https://mak3r.ai/docs/edge
+After=network.target
+Wants=network.target
+
+[Service]
+Type=notify
+User=mak3r
+Group=mak3r
+WorkingDirectory=/opt/mak3r/edge
+ExecStart=/opt/mak3r/edge/MAK3R.Edge
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=30
+
+# Restart policy
+Restart=always
+RestartSec=5
+StartLimitInterval=300
+StartLimitBurst=5
+
+# Environment variables
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+Environment=DOTNET_USE_POLLING_FILE_WATCHER=true
+
+# Security settings
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/mak3r/edge/data
+ReadWritePaths=/opt/mak3r/edge/logs
+ReadWritePaths=/var/log/mak3r
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=1G
+CPUQuota=200%
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=mak3r-edge
+
+[Install]
+WantedBy=multi-user.target

@@ -13,6 +13,7 @@ using MAK3R.Core;
 using MAK3R.Connectors;
 // Connector-specific using statements removed for MCP architecture
 using MAK3R.Api.Endpoints;
+using MAK3R.Api.Hubs;
 using MAK3R.Core.Hubs;
 using MAK3R.Core.Services;
 
@@ -107,8 +108,9 @@ app.UseCors("AllowBlazorWasm");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// SignalR Hub
+// SignalR Hubs
 app.MapHub<MachineDataHub>("/hubs/machinedata");
+app.MapHub<MachineHub>("/hubs/machines");  // Edge-to-Cluster hub
 
 // Health check endpoint
 app.MapGet("/api/health", () => Results.Ok(new { Status = "Healthy", Timestamp = DateTime.UtcNow }))

@@ -272,18 +272,24 @@ public class OpcUaConnector : IConnector, IDisposable
 
         foreach (var nodeId in _config.NodeIds)
         {
-            var value = nodeId.ToLower() switch
+            var value = (object)(nodeId.ToLower() switch
             {
                 var n when n.Contains("temperature") => Math.Round(20 + random.NextDouble() * 60, 2), // 20-80°C
                 var n when n.Contains("pressure") => Math.Round(1000 + random.NextDouble() * 500, 1), // 1000-1500 Pa
-                var n when n.Contains("rpm") => random.Next(800, 2000), // 800-2000 RPM
+                var n when n.Contains("rpm") || n.Contains("spindle") => random.Next(800, 2000), // 800-2000 RPM
                 var n when n.Contains("vibration") => Math.Round(random.NextDouble() * 2, 3), // 0-2 mm/s
                 var n when n.Contains("current") => Math.Round(5 + random.NextDouble() * 15, 2), // 5-20A
                 var n when n.Contains("voltage") => Math.Round(220 + random.NextDouble() * 20, 1), // 220-240V
                 var n when n.Contains("power") => Math.Round(1000 + random.NextDouble() * 3000, 0), // 1-4kW
                 var n when n.Contains("flow") => Math.Round(10 + random.NextDouble() * 40, 2), // 10-50 L/min
+                var n when n.Contains("execution") => random.Next(0, 3) switch { 0 => "READY", 1 => "ACTIVE", _ => "FEED_HOLD" },
+                var n when n.Contains("mode") => random.Next(0, 3) switch { 0 => "AUTO", 1 => "MDI", _ => "MANUAL" },
+                var n when n.Contains("program") => $"MAIN{random.Next(100, 999)}",
+                var n when n.Contains("block") => random.Next(1, 1000),
+                var n when n.Contains("tool") => random.Next(1, 25),
+                var n when n.Contains("partcount") => random.Next(0, 50),
                 _ => Math.Round(random.NextDouble() * 100, 2) // Default 0-100
-            };
+            });
 
             var telemetryData = new Dictionary<string, object>
             {
@@ -291,12 +297,15 @@ public class OpcUaConnector : IConnector, IDisposable
                 { "value", value },
                 { "quality", "Good" },
                 { "timestamp", timestamp },
-                { "sourceTimestamp", timestamp.AddMilliseconds(-random.Next(0, 100)) }
+                { "sourceTimestamp", timestamp.AddMilliseconds(-random.Next(0, 100)) },
+                { "machineId", _config.MachineId },
+                { "vendor", "SIEMENS" },
+                { "protocol", "OPC UA" }
             };
 
             var upsertEvent = new UpsertEvent(
-                "Telemetry",
-                nodeId,
+                "MachineData",
+                $"{_config.MachineId}-{nodeId}",
                 JsonSerializer.SerializeToElement(telemetryData),
                 timestamp
             );
@@ -313,7 +322,7 @@ public class OpcUaConnector : IConnector, IDisposable
             }
         }
 
-        _logger.LogDebug("Generated simulator data for {NodeCount} nodes", _config.NodeIds.Count);
+        _logger.LogDebug("Generated OPC UA simulator data for {NodeCount} nodes", _config.NodeIds.Count);
     }
 
     public void Dispose()
@@ -334,18 +343,19 @@ public class OpcUaConnector : IConnector, IDisposable
 
 public class OpcUaConfig
 {
+    public string MachineId { get; set; } = "MACHINE-01";
     public string EndpointUrl { get; set; } = "opc.tcp://localhost:4840";
     public bool IsSimulator { get; set; } = true;
     public string SecurityPolicy { get; set; } = "None";
     public List<string> NodeIds { get; set; } = new()
     {
-        "ns=2;i=1001", // Temperature
-        "ns=2;i=1002", // Pressure
-        "ns=2;i=1003", // RPM
-        "ns=2;i=1004", // Vibration
-        "ns=2;i=1005", // Current
-        "ns=2;i=1006", // Voltage
-        "ns=2;i=1007", // Power
-        "ns=2;i=1008"  // Flow
+        "ns=3;s=Channel/State",     // execution state
+        "ns=3;s=Program/Name",      // program name
+        "ns=3;s=Program/Block",     // block number
+        "ns=3;s=Spindle/Speed",     // spindle RPM
+        "ns=3;s=Feed/Rate",         // feed rate
+        "ns=3;s=Tool/Number",       // tool number
+        "ns=3;s=Machine/Mode",      // machine mode
+        "ns=3;s=PartCount"          // part count
     };
 }

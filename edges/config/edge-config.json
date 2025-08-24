@@ -1,0 +1,50 @@
+{
+  "SiteId": "BLR-Plant-01",
+  "Timezone": "Asia/Kolkata",
+  "Uplink": {
+    "HubUrl": "https://localhost:7228/hubs/machines",
+    "ReconnectDelayMs": 5000,
+    "Batch": {
+      "MaxEvents": 50,
+      "MaxSizeBytes": 32768,
+      "FlushIntervalMs": 5000
+    }
+  },
+  "AdminApi": {
+    "Listen": "http://0.0.0.0:9080"
+  },
+  "Storage": {
+    "Root": "./data",
+    "Sqlite": {
+      "Path": "./data/netdiag.db"
+    }
+  },
+  "Queue": {
+    "Capacity": 10000
+  },
+  "LoadGen": {
+    "Enabled": true,
+    "Machines": 4
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "MAK3R": "Debug",
+      "Mak3r.Edge": "Debug",
+      "Microsoft.AspNetCore.SignalR": "Warning",
+      "Microsoft.AspNetCore.Http": "Warning"
+    },
+    "Console": {
+      "FormatterName": "simple",
+      "FormatterOptions": {
+        "SingleLine": true,
+        "IncludeScopes": true
+      }
+    },
+    "File": {
+      "Path": "./logs/edge-.log",
+      "RollingInterval": "Day",
+      "RetainedFileCountLimit": 7
+    }
+  }
+}
