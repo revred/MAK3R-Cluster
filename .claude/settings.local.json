@@ -41,7 +41,8 @@
       "Bash(start http://localhost:9080)",
       "Bash(git commit:*)",
       "Bash(dotnet clean:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(git check-ignore:*)"
     ],
     "deny": [],
     "ask": []
