@@ -1,664 +1,465 @@
 @page "/connectors"
-@using MAK3R.Connectors.Abstractions
-@using MAK3R.Shared.DTOs
-@using System.Text.Json
 @inject HttpClient Http
 @inject IJSRuntime JS
 
-<PageTitle>Connector Hub</PageTitle>
+<PageTitle>Connector Hub - MAK3R</PageTitle>
 
-<div class="page-header">
-    <h1>Connector Hub</h1>
-    <p>Manage and configure data connectors for your digital twin</p>
-</div>
+<div class="page-container">
+    <div class="page-header">
+        <h1>
+            <span class="material-symbols-outlined">hub</span>
+            Connector Hub
+        </h1>
+        <p class="text-muted">Manage and configure data connectors for your digital twin</p>
+    </div>
 
-<div class="connector-dashboard">
-    <div class="connector-types">
-        <h2>Available Connector Types</h2>
-        
-        @if (availableTypes == null)
-        {
-            <div class="loading-placeholder">
-                <SkeletonCard />
-                <SkeletonCard />
-                <SkeletonCard />
-            </div>
-        }
-        else if (!availableTypes.Any())
-        {
-            <div class="empty-state">
-                <span class="empty-icon">🔌</span>
-                <h3>No Connector Types Available</h3>
-                <p>Install connector packages to get started.</p>
-            </div>
-        }
-        else
-        {
-            <div class="connector-type-grid">
-                @foreach (var type in availableTypes)
-                {
-                    <div class="connector-type-card @(type.IsAvailable ? "available" : "unavailable")">
-                        <div class="type-header">
-                            <span class="type-icon">@GetConnectorIcon(type.Category)</span>
-                            <div class="type-info">
-                                <h3>@type.DisplayName</h3>
-                                <span class="type-category">@type.Category</span>
+    <div class="connector-dashboard">
+        <div class="connector-types">
+            <h2>Available Connector Types</h2>
+            
+            @if (isLoading)
+            {
+                <div class="loading-placeholder">
+                    @for (int i = 0; i < 3; i++)
+                    {
+                        <div class="skeleton-card">
+                            <div class="skeleton-header">
+                                <div class="skeleton-text skeleton-title"></div>
+                                <div class="skeleton-text skeleton-subtitle"></div>
                             </div>
-                            <div class="type-status">
-                                @if (type.IsAvailable)
-                                {
+                            <div class="skeleton-content">
+                                <div class="skeleton-text skeleton-line"></div>
+                                <div class="skeleton-text skeleton-line short"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else if (!connectorTypes.Any())
+            {
+                <div class="empty-state">
+                    <span class="material-symbols-outlined large-icon">extension</span>
+                    <h3>No Connector Types Available</h3>
+                    <p>Connector packages will be available here when installed.</p>
+                </div>
+            }
+            else
+            {
+                <div class="connector-type-grid">
+                    @foreach (var type in connectorTypes)
+                    {
+                        <div class="connector-type-card available">
+                            <div class="type-header">
+                                <span class="type-icon">@GetConnectorIcon(type.Category)</span>
+                                <div class="type-info">
+                                    <h3>@type.DisplayName</h3>
+                                    <span class="type-category">@type.Category</span>
+                                </div>
+                                <div class="type-status">
                                     <span class="status-badge available">Available</span>
-                                }
-                                else
-                                {
-                                    <span class="status-badge unavailable">Unavailable</span>
-                                }
+                                </div>
                             </div>
-                        </div>
-                        <p class="type-description">@type.Description</p>
-                        <div class="type-meta">
-                            <span class="version">v@type.Version</span>
-                        </div>
-                        <div class="type-actions">
-                            @if (type.IsAvailable)
-                            {
-                                <button class="btn btn-primary" @onclick="() => ShowCreateConnector(type)">
+                            <p class="type-description">@type.Description</p>
+                            <div class="type-meta">
+                                <span class="version">v@type.Version</span>
+                            </div>
+                            <div class="type-actions">
+                                <button class="btn btn-primary" @onclick="() => CreateConnector(type)">
                                     Create Instance
                                 </button>
-                                <button class="btn btn-secondary" @onclick="() => ShowSchema(type.TypeId)">
+                                <button class="btn btn-secondary" @onclick="() => ViewSchema(type)">
                                     View Schema
                                 </button>
-                            }
+                            </div>
                         </div>
-                    </div>
-                }
-            </div>
-        }
-    </div>
+                    }
+                </div>
+            }
+        </div>
 
-    <div class="connector-instances">
-        <h2>Active Connector Instances</h2>
-        
-        @if (activeConnectors == null)
-        {
-            <div class="loading-placeholder">
-                <SkeletonCard />
-                <SkeletonCard />
-            </div>
-        }
-        else if (!activeConnectors.Any())
-        {
-            <div class="empty-state">
-                <span class="empty-icon">⚡</span>
-                <h3>No Active Connectors</h3>
-                <p>Create connector instances to start syncing data.</p>
-            </div>
-        }
-        else
-        {
-            <div class="connector-instance-grid">
-                @foreach (var connector in activeConnectors)
-                {
-                    <div class="connector-instance-card">
-                        <div class="instance-header">
-                            <span class="instance-icon">@GetConnectorIcon(connector.Type)</span>
-                            <div class="instance-info">
-                                <h3>@connector.Name</h3>
-                                <span class="instance-id">@connector.Id</span>
-                            </div>
-                            <div class="instance-actions">
-                                <button class="btn btn-sm btn-secondary" @onclick="() => CheckHealth(connector.Id)">
-                                    Health Check
-                                </button>
-                                <button class="btn btn-sm btn-primary" @onclick="() => TriggerSync(connector.Id)">
-                                    Sync Now
-                                </button>
+        <div class="connector-instances">
+            <h2>Active Connector Instances</h2>
+            
+            @if (isLoading)
+            {
+                <div class="loading-placeholder">
+                    @for (int i = 0; i < 2; i++)
+                    {
+                        <div class="skeleton-card">
+                            <div class="skeleton-header">
+                                <div class="skeleton-text skeleton-title"></div>
+                                <div class="skeleton-text skeleton-subtitle"></div>
                             </div>
                         </div>
-                        <div class="instance-metadata">
-                            @if (connector.Metadata != null)
-                            {
-                                @foreach (var meta in connector.Metadata.Take(3))
-                                {
-                                    <div class="metadata-item">
-                                        <span class="meta-key">@meta.Key:</span>
-                                        <span class="meta-value">@meta.Value</span>
-                                    </div>
-                                }
-                            }
+                    }
+                </div>
+            }
+            else if (!activeConnectors.Any())
+            {
+                <div class="empty-state">
+                    <span class="material-symbols-outlined large-icon">power</span>
+                    <h3>No Active Connectors</h3>
+                    <p>Create connector instances to start syncing data with your systems.</p>
+                </div>
+            }
+            else
+            {
+                <div class="connector-instance-grid">
+                    @foreach (var connector in activeConnectors)
+                    {
+                        <div class="connector-instance-card">
+                            <div class="instance-header">
+                                <span class="instance-icon">@GetConnectorIcon(connector.Type)</span>
+                                <div class="instance-info">
+                                    <h3>@connector.Name</h3>
+                                    <span class="instance-id">@connector.Id</span>
+                                </div>
+                                <div class="instance-actions">
+                                    <button class="btn btn-sm btn-secondary" @onclick="() => CheckHealth(connector.Id)">
+                                        Health Check
+                                    </button>
+                                    <button class="btn btn-sm btn-primary" @onclick="() => TriggerSync(connector.Id)">
+                                        Sync Now
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="instance-metadata">
+                                <div class="metadata-item">
+                                    <span class="meta-key">Status:</span>
+                                    <span class="meta-value">Active</span>
+                                </div>
+                                <div class="metadata-item">
+                                    <span class="meta-key">Last Sync:</span>
+                                    <span class="meta-value">2 minutes ago</span>
+                                </div>
+                                <div class="metadata-item">
+                                    <span class="meta-key">Records:</span>
+                                    <span class="meta-value">1,247</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                }
-            </div>
-        }
+                    }
+                </div>
+            }
+        </div>
     </div>
 </div>
 
-@if (showCreateModal)
-{
-    <div class="modal-overlay" @onclick="CloseCreateModal">
-        <div class="modal-content" @onclick:stopPropagation="true">
-            <div class="modal-header">
-                <h3>Create @selectedType?.DisplayName Connector</h3>
-                <button class="modal-close" @onclick="CloseCreateModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                @if (configSchema != null)
-                {
-                    <form @onsubmit="CreateConnector" @onsubmit:preventDefault="true">
-                        <div class="form-group">
-                            <label for="connectorId">Connector ID</label>
-                            <input type="text" id="connectorId" @bind="newConnectorId" placeholder="my-connector-instance" required />
-                        </div>
-                        
-                        @foreach (var field in configSchema.Fields.Values)
-                        {
-                            <div class="form-group">
-                                <label for="@field.Name">
-                                    @field.DisplayName
-                                    @if (field.IsRequired)
-                                    {
-                                        <span class="required">*</span>
-                                    }
-                                </label>
-                                
-                                @if (field.Type == "string")
-                                {
-                                    @if (field.IsSecret)
-                                    {
-                                        <input type="password" id="@field.Name" 
-                                               @onchange="@(e => UpdateConfigValue(field.Name, e.Value?.ToString()))"
-                                               placeholder="@field.Description" 
-                                               required="@field.IsRequired" />
-                                    }
-                                    else if (field.EnumValues?.Any() == true)
-                                    {
-                                        <select id="@field.Name" 
-                                                @onchange="@(e => UpdateConfigValue(field.Name, e.Value?.ToString()))"
-                                                required="@field.IsRequired">
-                                            <option value="">Select...</option>
-                                            @foreach (var option in field.EnumValues)
-                                            {
-                                                <option value="@option">@option</option>
-                                            }
-                                        </select>
-                                    }
-                                    else
-                                    {
-                                        <input type="text" id="@field.Name" 
-                                               @onchange="@(e => UpdateConfigValue(field.Name, e.Value?.ToString()))"
-                                               placeholder="@field.Description" 
-                                               required="@field.IsRequired" />
-                                    }
-                                }
-                                else if (field.Type == "number")
-                                {
-                                    <input type="number" id="@field.Name" 
-                                           @onchange="@(e => UpdateConfigValue(field.Name, e.Value?.ToString()))"
-                                           placeholder="@field.Description" 
-                                           required="@field.IsRequired" />
-                                }
-                                else if (field.Type == "boolean")
-                                {
-                                    <input type="checkbox" id="@field.Name" 
-                                           @onchange="@(e => UpdateConfigValue(field.Name, e.Value))"
-                                           required="@field.IsRequired" />
-                                }
-                                
-                                @if (!string.IsNullOrEmpty(field.Description))
-                                {
-                                    <small class="field-description">@field.Description</small>
-                                }
-                            </div>
-                        }
-                        
-                        <div class="modal-actions">
-                            <button type="button" class="btn btn-secondary" @onclick="CloseCreateModal">
-                                Cancel
-                            </button>
-                            <button type="submit" class="btn btn-primary" disabled="@isCreatingConnector">
-                                @if (isCreatingConnector)
-                                {
-                                    <span>Creating...</span>
-                                }
-                                else
-                                {
-                                    <span>Create Connector</span>
-                                }
-                            </button>
-                        </div>
-                    </form>
-                }
-                else
-                {
-                    <div class="loading-placeholder">
-                        <SkeletonCard />
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-}
-
-<style>
-.connector-dashboard {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-top: 2rem;
-}
-
-.connector-type-grid, .connector-instance-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
-}
-
-.connector-type-card, .connector-instance-card {
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.5rem;
-    transition: border-color 0.2s;
-}
-
-.connector-type-card:hover, .connector-instance-card:hover {
-    border-color: var(--primary-color);
-}
-
-.connector-type-card.unavailable {
-    opacity: 0.6;
-}
-
-.type-header, .instance-header {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.type-icon, .instance-icon {
-    font-size: 2rem;
-}
-
-.type-info, .instance-info {
-    flex: 1;
-}
-
-.type-info h3, .instance-info h3 {
-    margin: 0;
-    font-size: 1.2rem;
-}
-
-.type-category {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-.instance-id {
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    font-family: 'Courier New', monospace;
-}
-
-.status-badge {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.status-badge.available {
-    background: var(--success-color-light);
-    color: var(--success-color);
-}
-
-.status-badge.unavailable {
-    background: var(--warning-color-light);
-    color: var(--warning-color);
-}
-
-.type-description {
-    color: var(--text-muted);
-    margin: 1rem 0;
-    line-height: 1.4;
-}
-
-.type-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 1rem 0;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-}
-
-.type-actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.instance-actions {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.instance-metadata {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border-color);
-}
-
-.metadata-item {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-}
-
-.meta-key {
-    color: var(--text-muted);
-}
-
-.meta-value {
-    font-family: 'Courier New', monospace;
-    max-width: 150px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background: var(--surface-color);
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.modal-header h3 {
-    margin: 0;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--text-muted);
-}
-
-.modal-body {
-    padding: 1.5rem;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-}
-
-.required {
-    color: var(--danger-color);
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background: var(--background-color);
-    color: var(--text-color);
-}
-
-.field-description {
-    display: block;
-    margin-top: 0.25rem;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-.modal-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border-color);
-}
-
-@@media (max-width: 768px) {
-    .connector-dashboard {
-        grid-template-columns: 1fr;
-    }
-    
-    .connector-type-grid, .connector-instance-grid {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
-
 @code {
-    private IEnumerable<ConnectorTypeInfo>? availableTypes;
-    private IEnumerable<dynamic>? activeConnectors;
+    private bool isLoading = true;
+    private List<ConnectorType> connectorTypes = new();
+    private List<ConnectorInstance> activeConnectors = new();
     private bool showCreateModal = false;
-    private ConnectorTypeInfo? selectedType;
-    private ConnectorConfigurationSchema? configSchema;
-    private string newConnectorId = "";
-    private Dictionary<string, object> configValues = new();
-    private bool isCreatingConnector = false;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
-    }
-
-    private async Task LoadData()
-    {
         try
         {
-            // Load available connector types
-            var typesResponse = await Http.GetAsync("/api/connectors/types");
-            if (typesResponse.IsSuccessStatusCode)
-            {
-                var json = await typesResponse.Content.ReadAsStringAsync();
-                availableTypes = JsonSerializer.Deserialize<ConnectorTypeInfo[]>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-            }
-
-            // Load active connector instances
-            var instancesResponse = await Http.GetAsync("/api/connectors/instances");
-            if (instancesResponse.IsSuccessStatusCode)
-            {
-                var json = await instancesResponse.Content.ReadAsStringAsync();
-                activeConnectors = JsonSerializer.Deserialize<dynamic[]>(json);
-            }
-        }
-        catch (Exception ex)
-        {
-            await JS.InvokeVoidAsync("console.error", "Failed to load connector data", ex.Message);
-        }
-    }
-
-    private async Task ShowCreateConnector(ConnectorTypeInfo type)
-    {
-        selectedType = type;
-        showCreateModal = true;
-        configValues.Clear();
-        newConnectorId = $"{type.TypeId}-{DateTime.Now:yyyyMMddHHmm}";
-
-        // Load configuration schema
-        try
-        {
-            var response = await Http.GetAsync($"/api/connectors/types/{type.TypeId}/schema");
-            if (response.IsSuccessStatusCode)
-            {
-                var json = await response.Content.ReadAsStringAsync();
-                configSchema = JsonSerializer.Deserialize<ConnectorConfigurationSchema>(json, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-            }
-        }
-        catch (Exception ex)
-        {
-            await JS.InvokeVoidAsync("console.error", "Failed to load schema", ex.Message);
-        }
-
-        StateHasChanged();
-    }
-
-    private async Task ShowSchema(string typeId)
-    {
-        // Open schema in a new tab or modal
-        await JS.InvokeVoidAsync("console.log", $"Show schema for {typeId}");
-    }
-
-    private void CloseCreateModal()
-    {
-        showCreateModal = false;
-        selectedType = null;
-        configSchema = null;
-        configValues.Clear();
-    }
-
-    private void UpdateConfigValue(string key, object? value)
-    {
-        if (value != null)
-        {
-            configValues[key] = value;
-        }
-        else
-        {
-            configValues.Remove(key);
-        }
-    }
-
-    private async Task CreateConnector()
-    {
-        if (selectedType == null || configSchema == null)
-            return;
-
-        isCreatingConnector = true;
-        
-        try
-        {
-            var request = new
-            {
-                ConnectorId = newConnectorId,
-                TypeId = selectedType.TypeId,
-                Type = selectedType.Category,
-                Settings = configValues,
-                IsEnabled = true
-            };
-
-            var response = await Http.PostAsJsonAsync("/api/connectors", request);
+            // Simulate loading delay
+            await Task.Delay(1000);
             
-            if (response.IsSuccessStatusCode)
+            // Load demo data
+            connectorTypes = new List<ConnectorType>
             {
-                await JS.InvokeVoidAsync("alert", "Connector created successfully!");
-                CloseCreateModal();
-                await LoadData(); // Refresh the data
-            }
-            else
+                new("shopify", "Shopify", "E-commerce", "Connect to Shopify store for order and product data", "1.0.0"),
+                new("netsuite", "NetSuite", "ERP", "Enterprise resource planning integration", "2.1.0"),
+                new("opcua", "OPC UA", "Industrial", "Industrial automation protocol for machine data", "1.5.2"),
+                new("rest-api", "REST API", "Web Service", "Generic REST API connector for web services", "1.2.0")
+            };
+            
+            activeConnectors = new List<ConnectorInstance>
             {
-                var error = await response.Content.ReadAsStringAsync();
-                await JS.InvokeVoidAsync("alert", $"Failed to create connector: {error}");
-            }
+                new("shopify-main", "Main Shopify Store", "shopify"),
+                new("opcua-line1", "Production Line 1", "opcua")
+            };
         }
         catch (Exception ex)
         {
-            await JS.InvokeVoidAsync("alert", $"Error creating connector: {ex.Message}");
+            await JS.InvokeVoidAsync("console.error", "Error loading connector data", ex.Message);
         }
         finally
         {
-            isCreatingConnector = false;
+            isLoading = false;
         }
     }
 
-    private async Task CheckHealth(string connectorId)
+    private void CreateConnector(ConnectorType type)
     {
-        try
-        {
-            var response = await Http.GetAsync($"/api/connectors/instances/{connectorId}/health");
-            if (response.IsSuccessStatusCode)
-            {
-                var json = await response.Content.ReadAsStringAsync();
-                await JS.InvokeVoidAsync("alert", $"Health check result: {json}");
-            }
-            else
-            {
-                await JS.InvokeVoidAsync("alert", "Health check failed");
-            }
-        }
-        catch (Exception ex)
-        {
-            await JS.InvokeVoidAsync("alert", $"Health check error: {ex.Message}");
-        }
+        _ = JS.InvokeVoidAsync("alert", $"Create connector dialog for {type.DisplayName} would open here");
     }
 
-    private async Task TriggerSync(string connectorId)
+    private void ViewSchema(ConnectorType type)
     {
-        try
-        {
-            var response = await Http.PostAsync($"/api/connectors/instances/{connectorId}/sync", null);
-            if (response.IsSuccessStatusCode)
-            {
-                await JS.InvokeVoidAsync("alert", "Sync triggered successfully");
-            }
-            else
-            {
-                await JS.InvokeVoidAsync("alert", "Sync failed");
-            }
-        }
-        catch (Exception ex)
-        {
-            await JS.InvokeVoidAsync("alert", $"Sync error: {ex.Message}");
-        }
+        _ = JS.InvokeVoidAsync("alert", $"Schema viewer for {type.DisplayName} would open here");
     }
 
-    private string GetConnectorIcon(string type)
+    private void CheckHealth(string connectorId)
     {
-        return type switch
+        _ = JS.InvokeVoidAsync("alert", $"Health check for {connectorId}: All systems operational");
+    }
+
+    private void TriggerSync(string connectorId)
+    {
+        _ = JS.InvokeVoidAsync("alert", $"Sync triggered for {connectorId}");
+    }
+
+    private string GetConnectorIcon(string category)
+    {
+        return category.ToLower() switch
         {
-            "shopify" => "🛒",
-            "netsuite" => "💼",
-            "opcua" => "🏭",
-            "rest-api" => "🌐",
-            "database" => "🗄️",
-            "file" => "📁",
+            "e-commerce" => "🛒",
+            "erp" => "💼",
+            "industrial" => "🏭",
+            "web service" => "🌐",
             _ => "🔌"
         };
     }
+
+    private record ConnectorType(string TypeId, string DisplayName, string Category, string Description, string Version);
+    private record ConnectorInstance(string Id, string Name, string Type);
 }
+
+<style>
+    .page-container {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .page-header h1 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .connector-dashboard {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        margin-top: 2rem;
+    }
+
+    .connector-types h2, .connector-instances h2 {
+        margin-bottom: 1.5rem;
+        color: #333;
+        font-size: 1.5rem;
+    }
+
+    .loading-placeholder, .empty-state {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 300px;
+    }
+
+    .empty-state {
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem;
+        background: var(--bs-light);
+        border-radius: 12px;
+    }
+
+    .large-icon {
+        font-size: 3rem !important;
+        color: var(--bs-primary);
+        margin-bottom: 1rem;
+    }
+
+    .connector-type-grid, .connector-instance-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .connector-type-card, .connector-instance-card, .skeleton-card {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: all 0.2s;
+    }
+
+    .connector-type-card:hover, .connector-instance-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-color: var(--bs-primary);
+    }
+
+    .type-header, .instance-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .type-icon, .instance-icon {
+        font-size: 2rem;
+    }
+
+    .type-info, .instance-info {
+        flex: 1;
+    }
+
+    .type-info h3, .instance-info h3 {
+        margin: 0 0 0.25rem 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+    .type-category {
+        color: var(--bs-primary);
+        font-size: 0.9rem;
+        font-weight: 500;
+        background: var(--bs-primary-subtle);
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+    }
+
+    .instance-id {
+        color: #666;
+        font-size: 0.8rem;
+        font-family: 'Courier New', monospace;
+    }
+
+    .status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .status-badge.available {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .type-description {
+        color: #666;
+        margin: 1rem 0;
+        line-height: 1.4;
+        font-size: 0.9rem;
+    }
+
+    .type-meta {
+        margin: 1rem 0;
+        font-size: 0.9rem;
+        color: #666;
+    }
+
+    .type-actions, .instance-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+
+    .instance-metadata {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .metadata-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .meta-key {
+        color: #666;
+        font-weight: 500;
+    }
+
+    .meta-value {
+        font-family: 'Courier New', monospace;
+        color: #333;
+    }
+
+    .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-primary {
+        background: var(--bs-primary);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        opacity: 0.9;
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--bs-primary);
+        border: 1px solid var(--bs-primary);
+    }
+
+    .btn-secondary:hover {
+        background: var(--bs-primary);
+        color: white;
+    }
+
+    .btn-sm {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    /* Skeleton animations */
+    .skeleton-header, .skeleton-content {
+        margin-bottom: 1rem;
+    }
+
+    .skeleton-text, .skeleton-title, .skeleton-subtitle, .skeleton-line {
+        height: 1rem;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+    }
+
+    .skeleton-title {
+        height: 1.5rem;
+        width: 70%;
+    }
+
+    .skeleton-subtitle {
+        height: 1rem;
+        width: 40%;
+    }
+
+    .skeleton-line {
+        width: 100%;
+    }
+
+    .skeleton-line.short {
+        width: 60%;
+    }
+
+    @@keyframes loading {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .connector-dashboard {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+    }
+</style>

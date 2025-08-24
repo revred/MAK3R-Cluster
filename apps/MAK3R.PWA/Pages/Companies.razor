@@ -1,91 +1,307 @@
 @page "/companies"
 @using MAK3R.Shared.DTOs
-@using MAK3R.UI.Services
 @inject HttpClient Http
-@inject IProgressiveLoadingService ProgressiveLoading
 
 <PageTitle>Companies - MAK3R</PageTitle>
 
 <div class="page-container">
     <div class="page-header">
-        <h1>Companies</h1>
+        <h1>
+            <span class="material-symbols-outlined">business</span>
+            Companies
+        </h1>
         <p class="text-muted">Manage your organization's digital twins</p>
     </div>
 
     <div class="page-content">
-        <ProgressiveList TItem="CompanyDto" 
-                        ItemTemplate="CompanyCardTemplate" 
-                        DataLoader="LoadCompanies" 
-                        PageSize="10"
-                        SkeletonCount="6" />
+        @if (companies == null)
+        {
+            <div class="loading-state">
+                <div class="skeleton-cards">
+                    @for (int i = 0; i < 6; i++)
+                    {
+                        <div class="skeleton-card">
+                            <div class="skeleton-header">
+                                <div class="skeleton-text skeleton-title"></div>
+                                <div class="skeleton-text skeleton-subtitle"></div>
+                            </div>
+                            <div class="skeleton-content">
+                                <div class="skeleton-text skeleton-line"></div>
+                                <div class="skeleton-text skeleton-line short"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+        else if (!companies.Any())
+        {
+            <div class="empty-state">
+                <span class="material-symbols-outlined large-icon">business</span>
+                <h2>No Companies Found</h2>
+                <p>Add your first company to get started with digital twin management.</p>
+                <button class="btn btn-primary">Add Company</button>
+            </div>
+        }
+        else
+        {
+            <div class="companies-grid">
+                @foreach (var company in companies)
+                {
+                    <div class="company-card">
+                        <div class="card-header">
+                            <h3>@company.Name</h3>
+                            <span class="company-industry">@company.Industry</span>
+                        </div>
+                        <div class="card-content">
+                            @if (!string.IsNullOrEmpty(company.RegistrationId))
+                            {
+                                <div class="detail-item">
+                                    <span class="label">Registration:</span>
+                                    <span class="value">@company.RegistrationId</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(company.TaxId))
+                            {
+                                <div class="detail-item">
+                                    <span class="label">Tax ID:</span>
+                                    <span class="value">@company.TaxId</span>
+                                </div>
+                            }
+                            @if (!string.IsNullOrEmpty(company.Website))
+                            {
+                                <div class="detail-item">
+                                    <span class="label">Website:</span>
+                                    <a href="@company.Website" class="value link" target="_blank">@company.Website</a>
+                                </div>
+                            }
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn secondary">View Details</button>
+                            <button class="btn primary">Manage</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
     </div>
 </div>
 
 @code {
-    private RenderFragment<CompanyDto> CompanyCardTemplate => company => 
-    @<div class="company-card">
-        <div class="card-header">
-            <h3>@company.Name</h3>
-            <span class="company-industry">@company.Industry</span>
-        </div>
-        <div class="card-content">
-            @if (!string.IsNullOrEmpty(company.RegistrationId))
-            {
-                <div class="detail-item">
-                    <span class="label">Registration:</span>
-                    <span class="value">@company.RegistrationId</span>
-                </div>
-            }
-            @if (!string.IsNullOrEmpty(company.TaxId))
-            {
-                <div class="detail-item">
-                    <span class="label">Tax ID:</span>
-                    <span class="value">@company.TaxId</span>
-                </div>
-            }
-            @if (!string.IsNullOrEmpty(company.Website))
-            {
-                <div class="detail-item">
-                    <span class="label">Website:</span>
-                    <a href="@company.Website" class="value link" target="_blank">@company.Website</a>
-                </div>
-            }
-        </div>
-        <div class="card-actions">
-            <button class="btn secondary">View Details</button>
-            <button class="btn primary">Manage</button>
-        </div>
-    </div>;
-
-    private async ValueTask<IEnumerable<CompanyDto>> LoadCompanies(int page, int size, CancellationToken cancellationToken)
+    private List<CompanyDto>? companies;
+    
+    protected override async Task OnInitializedAsync()
     {
         try
         {
-            // Add authentication header if we have a token
-            var response = await Http.GetAsync($"api/companies?page={page}&size={size}", cancellationToken);
+            // Add a small delay to show loading state
+            await Task.Delay(500);
+            
+            var response = await Http.GetAsync("api/companies");
             
             if (!response.IsSuccessStatusCode)
             {
                 // For demo purposes, return demo data if API fails
-                if (page == 0)
+                companies = new List<CompanyDto>
                 {
-                    return new List<CompanyDto>
-                    {
-                        new(Guid.NewGuid(), "Contoso Gears Pvt Ltd", "CIN-U12345MH2010PTC123456", "GST-27ABCDE1234F1Z5", "Manufacturing", "https://contosogears.com", DateTime.Now.AddMonths(-6), DateTime.Now),
-                        new(Guid.NewGuid(), "Acme Manufacturing Inc", "EIN-12-3456789", "TAX-987654321", "Industrial", "https://acme-mfg.com", DateTime.Now.AddMonths(-12), DateTime.Now),
-                        new(Guid.NewGuid(), "Tech Solutions Ltd", "REG-TS2023001", "VAT-GB123456789", "Technology", "https://techsol.co.uk", DateTime.Now.AddMonths(-3), DateTime.Now),
-                    };
-                }
-                return Array.Empty<CompanyDto>();
+                    new(Guid.NewGuid(), "Contoso Gears Pvt Ltd", "CIN-U12345MH2010PTC123456", "GST-27ABCDE1234F1Z5", "Manufacturing", "https://contosogears.com", DateTime.Now.AddMonths(-6), DateTime.Now),
+                    new(Guid.NewGuid(), "Acme Manufacturing Inc", "EIN-12-3456789", "TAX-987654321", "Industrial", "https://acme-mfg.com", DateTime.Now.AddMonths(-12), DateTime.Now),
+                    new(Guid.NewGuid(), "Tech Solutions Ltd", "REG-TS2023001", "VAT-GB123456789", "Technology", "https://techsol.co.uk", DateTime.Now.AddMonths(-3), DateTime.Now),
+                };
             }
-            
-            var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<CompanyDto>>(cancellationToken);
-            return pagedResult?.Items ?? Array.Empty<CompanyDto>();
+            else
+            {
+                var pagedResult = await response.Content.ReadFromJsonAsync<PagedResult<CompanyDto>>();
+                companies = pagedResult?.Items?.ToList() ?? new List<CompanyDto>();
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading companies: {ex.Message}");
-            return Array.Empty<CompanyDto>();
+            companies = new List<CompanyDto>(); // Empty list to show empty state
         }
     }
 }
+
+<style>
+    .page-container {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    .page-header h1 {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .loading-state, .empty-state {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 50vh;
+    }
+    
+    .empty-state {
+        flex-direction: column;
+        text-align: center;
+        padding: 3rem;
+        background: var(--bs-light);
+        border-radius: 12px;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+    
+    .large-icon {
+        font-size: 4rem !important;
+        color: var(--bs-primary);
+        margin-bottom: 1rem;
+    }
+    
+    .skeleton-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+        width: 100%;
+    }
+    
+    .companies-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .company-card, .skeleton-card {
+        background: white;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: box-shadow 0.2s, border-color 0.2s;
+    }
+    
+    .company-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border-color: var(--bs-primary);
+    }
+    
+    .card-header {
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .card-header h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    
+    .company-industry {
+        color: var(--bs-primary);
+        font-size: 0.9rem;
+        font-weight: 500;
+        background: var(--bs-primary-subtle);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+    }
+    
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .detail-item .label {
+        color: #666;
+        font-weight: 500;
+    }
+    
+    .card-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #f0f0f0;
+    }
+    
+    .btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 4px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn.primary {
+        background: var(--bs-primary);
+        color: white;
+    }
+    
+    .btn.primary:hover {
+        opacity: 0.9;
+    }
+    
+    .btn.secondary {
+        background: transparent;
+        color: var(--bs-primary);
+        border: 1px solid var(--bs-primary);
+    }
+    
+    .btn.secondary:hover {
+        background: var(--bs-primary);
+        color: white;
+    }
+    
+    /* Skeleton animations */
+    .skeleton-header, .skeleton-content {
+        margin-bottom: 1rem;
+    }
+    
+    .skeleton-text, .skeleton-title, .skeleton-subtitle, .skeleton-line {
+        height: 1rem;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+        border-radius: 4px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .skeleton-title {
+        height: 1.5rem;
+        width: 70%;
+    }
+    
+    .skeleton-subtitle {
+        height: 1rem;
+        width: 40%;
+    }
+    
+    .skeleton-line {
+        width: 100%;
+    }
+    
+    .skeleton-line.short {
+        width: 60%;
+    }
+    
+    @@keyframes loading {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
+        }
+    }
+</style>

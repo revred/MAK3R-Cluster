@@ -17,7 +17,7 @@ public abstract class AppShellBase : ComponentBase
 
     protected List<NavItemModel> NavigationItems { get; set; } = new()
     {
-        new("dashboard", "Dashboard", "/", null),
+        new("dashboard", "Dashboard", "/dashboard", null),
         new("settings_input_composite", "Onboard", "/onboard", null),
         new("business", "Companies", "/companies", null),
         new("account_tree", "Twin", "/twin", null),
